@@ -40,22 +40,16 @@
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; }
     .day { background: var(--day-bg-gradient); border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: all 0.2s; }
     
-    /* NEW STYLING: Checked Box with Tick Mark and Color Change */
     .day.checked { background: var(--checked-gradient); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(56, 239, 125, 0.3); }
-    
-    /* Lock Indicator Styling */
     .day.locked { cursor: not-allowed; opacity: 0.85; background: #e2e8f0; color: #94a3b8; border-style: dashed; }
     .day.locked.checked { background: linear-gradient(135deg, #0d7a71, #27a858); color: rgba(255,255,255,0.8); }
-
     .day.today { border: 2px solid #3b82f6; background: #fff; color: #3b82f6; font-weight: 700; }
     .day.today::after { content: '●'; position: absolute; top: 2px; right: 5px; font-size: 7px; color: #3b82f6; }
     
-    /* Custom Checkbox Design for Tick Mark */
     .checkbox-container { display: inline-block; position: relative; width: 18px; height: 18px; margin-top: 6px; }
     input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 6px; cursor: pointer; background: #fff; margin: 0; display: block; transition: all 0.15s; }
     .day.checked input[type="checkbox"] { background: #fff; border-color: #fff; }
     
-    /* The Custom White Tick ✓ */
     .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #11998e; font-size: 12px; font-weight: 900; transition: transform 0.15s ease; pointer-events: none; }
     .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
     .day.locked .checkbox-container::after { color: #0d7a71; }
@@ -184,6 +178,12 @@
   </div>
 
   <script>
+    // SECURE INTERNET CLOUD STORAGE KEY
+    const API_URL = `https://api.jsonbin.io/v3/b/65b53d09dc746540189b7cf3`;
+    const MASTER_KEY = "$2a$10$W1eA9S7iOnv9m3RByI0HduoEqK9p4YpAghuYfX1K9wV9yB5Vl96uq"; 
+
+    let cloudDataCache = {};
+    let syncTimeout = null;
     let currentMonth = new Date().getMonth() + 1; 
     let currentYear = new Date().getFullYear(); 
     let currentActiveTab = 'self';
@@ -196,8 +196,42 @@
       reasoning: ["Alphanumeric Series", "Blood Relation", "Mathematical Operations", "Word Building", "Logical Sequence Test", "Inserting the Missing", "Clock", "Paper Folding & Cutting", "Counting of Figures", "Coding Decoding", "Number Series", "Image", "Calendar", "Dice", "Alphabet Test", "Inequality", "Analogy", "Classification", "Logical Venn Diagram", "Syllogism", "Distance & Direction", "Seating Arrangement", "Puzzle", "Ranking Order", "Data Sufficiency", "Statement Based Question", "Cube & Cuboid"]
     };
 
-    function getLocalItem(key) { return localStorage.getItem(key) || null; }
-    function saveLocalItem(key, value) { localStorage.setItem(key, value.toString()); }
+    // INSTANT LOCAL RETRIEVAL WITH CLOUD BACKUP
+    function getItemValue(key) { 
+      return localStorage.getItem(key) || cloudDataCache[key] || null; 
+    }
+
+    // INSTANT LOCAL SAVE + BACKGROUND INTERNET SYNC
+    function saveItemValue(key, value) { 
+      localStorage.setItem(key, value.toString());
+      cloudDataCache[key] = value.toString();
+      
+      // Delay internet push by 1 second to bundle clicks together (No lagging!)
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(async () => {
+        try {
+          await fetch(API_URL, { 
+            method: "PUT", 
+            headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
+            body: JSON.stringify(cloudDataCache) 
+          });
+        } catch(e) { console.log("Background sync paused. Saved locally."); }
+      }, 1200);
+    }
+
+    async function loadCloudData() {
+      try {
+        const res = await fetch(`${API_URL}/latest?meta=false`, { headers: { "X-Master-Key": MASTER_KEY } });
+        if(res.ok) { 
+          cloudDataCache = await res.json(); 
+          // Update local memory with cloud truth
+          for (let key in cloudDataCache) {
+            localStorage.setItem(key, cloudDataCache[key]);
+          }
+        }
+      } catch(e) { console.log("Offline mode active."); }
+      refreshUI();
+    }
     
     function startDigitalClock() { setInterval(() => { const now = new Date(); let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0'); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; document.getElementById('liveClock').innerText = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`; }, 1000); }
     function setupHeader() { const now = new Date(); const hrs = now.getHours(); let greet = "Good Morning"; if (hrs >= 12 && hrs < 17) greet = "Good Afternoon"; else if (hrs >= 17 && hrs < 22) greet = "Good Evening"; else if (hrs >= 22 || hrs < 5) greet = "Hello"; document.getElementById('greetingText').innerText = `${greet}, Utkarsh!`; }
@@ -240,7 +274,6 @@
       else { renderSyllabusSheet(currentActiveTab); }
     }
 
-    // FUNCTION TO CHECK IF A DATE IS IN THE PAST
     function isPastDate(year, month, day) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -261,7 +294,7 @@
         label.appendChild(checkbox);
 
         const storageKey = `${keyPrefix}_${currentYear}_${currentMonth}_${day}`;
-        checkbox.checked = getLocalItem(storageKey) === 'true';
+        checkbox.checked = getItemValue(storageKey) === 'true';
         
         const isLocked = isPastDate(currentYear, currentMonth, day);
         
@@ -276,7 +309,7 @@
           checkbox.disabled = true;
         } else {
           checkbox.onchange = () => {
-            saveLocalItem(storageKey, checkbox.checked);
+            saveItemValue(storageKey, checkbox.checked);
             dayBox.classList.toggle('checked', checkbox.checked);
             updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
           };
@@ -284,7 +317,7 @@
         
         if (isStudy) {
           const range = document.createElement('input'); range.type = 'range'; range.min = 0; range.max = 8; range.step = 1;
-          const hoursKey = storageKey + '_hours'; range.value = parseInt(getLocalItem(hoursKey) || '0', 10);
+          const hoursKey = storageKey + '_hours'; range.value = parseInt(getItemValue(hoursKey) || '0', 10);
           const rangeDiv = document.createElement('div'); rangeDiv.style.display = 'flex'; rangeDiv.style.alignItems = 'center'; rangeDiv.style.gap = '4px';
           const rangeLabel = document.createElement('div'); rangeLabel.style.fontSize = '10px'; rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
           
@@ -292,11 +325,11 @@
             range.disabled = true;
           } else {
             range.oninput = () => {
-              saveLocalItem(hoursKey, range.value);
+              saveItemValue(hoursKey, range.value);
               rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
               if(parseInt(range.value, 10) > 0 && !checkbox.checked) { 
                 checkbox.checked = true; 
-                saveLocalItem(storageKey, 'true'); 
+                saveItemValue(storageKey, 'true'); 
                 dayBox.classList.add('checked'); 
               }
               updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
@@ -340,7 +373,7 @@
       
       syllabusData[subjectKey].forEach((chapterName, index) => {
         const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`;
-        const savedStatus = getLocalItem(storageKey) || 'not_started';
+        const savedStatus = getItemValue(storageKey) || 'not_started';
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td>
@@ -358,13 +391,13 @@
     }
 
     function saveSyllabusStatus(subjectKey, chNo, selectElement) {
-      saveLocalItem(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value);
+      saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value);
       selectElement.setAttribute('data-status', selectElement.value);
       calculateSyllabusProgress(subjectKey);
     }
 
     function calculateSyllabusProgress(subjectKey) {
-      let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getLocalItem(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; });
+      let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; });
       const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0;
       document.getElementById('syllabusCircle').innerText = `${percent}%`;
       document.getElementById('syllabusCircle').style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
@@ -381,7 +414,9 @@
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
-    startDigitalClock(); setupHeader(); refreshUI();
+    startDigitalClock(); setupHeader(); 
+    loadCloudData(); // Fetch cloud data on load
+    setInterval(loadCloudData, 10000); // Check for changes every 10 seconds automatically
   </script>
 </body>
 </html>
