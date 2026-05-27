@@ -36,15 +36,34 @@
     .card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); display: flex; flex-direction: column; border: 1px solid #f1f5f9; }
     .card h3 { margin-top: 0; margin-bottom: 20px; font-size: 17px; color: var(--text-dark); font-weight: 700; display: flex; align-items: center; gap: 8px; }
     .card h3::before { content: ''; width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: #3b82f6; }
+    
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; }
-    .day { background: var(--day-bg-gradient); border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-    .day.checked { background: var(--checked-gradient); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(56, 239, 125, 0.2); }
+    .day { background: var(--day-bg-gradient); border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: all 0.2s; }
+    
+    /* NEW STYLING: Checked Box with Tick Mark and Color Change */
+    .day.checked { background: var(--checked-gradient); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(56, 239, 125, 0.3); }
+    
+    /* Lock Indicator Styling */
+    .day.locked { cursor: not-allowed; opacity: 0.85; background: #e2e8f0; color: #94a3b8; border-style: dashed; }
+    .day.locked.checked { background: linear-gradient(135deg, #0d7a71, #27a858); color: rgba(255,255,255,0.8); }
+
     .day.today { border: 2px solid #3b82f6; background: #fff; color: #3b82f6; font-weight: 700; }
     .day.today::after { content: '●'; position: absolute; top: 2px; right: 5px; font-size: 7px; color: #3b82f6; }
-    input[type="checkbox"] { appearance: none; width: 14px; height: 14px; border: 2px solid #cbd5e1; border-radius: 4px; cursor: pointer; background: #fff; margin-top: 4px; }
-    .day.checked input[type="checkbox"] { border-color: rgba(255,255,255,0.8); background-color: rgba(255,255,255,0.2); }
+    
+    /* Custom Checkbox Design for Tick Mark */
+    .checkbox-container { display: inline-block; position: relative; width: 18px; height: 18px; margin-top: 6px; }
+    input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 6px; cursor: pointer; background: #fff; margin: 0; display: block; transition: all 0.15s; }
+    .day.checked input[type="checkbox"] { background: #fff; border-color: #fff; }
+    
+    /* The Custom White Tick ✓ */
+    .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #11998e; font-size: 12px; font-weight: 900; transition: transform 0.15s ease; pointer-events: none; }
+    .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
+    .day.locked .checkbox-container::after { color: #0d7a71; }
+    .day.locked input[type="checkbox"] { cursor: not-allowed; background: #cbd5e1; border-color: #cbd5e1; }
+
     input[type="range"] { width: 90%; height: 4px; appearance: none; background: rgba(0,0,0,0.05); border-radius: 10px; margin-top: 4px; }
     input[type="range"]::-webkit-slider-thumb { appearance: none; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
+    .day.locked input[type="range"] { cursor: not-allowed; opacity: 0.5; }
     
     .timer-container { background: #fff7ed; border: 1px solid #ffedd5; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
     .timer-display { font-size: 26px; font-weight: 800; color: #ea580c; font-family: monospace; margin-bottom: 10px; }
@@ -66,7 +85,6 @@
     .progress-container { margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; }
     .mini-circle { width: 35px; height: 35px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
     .stats-lbl { font-size: 12px; font-weight: 700; color: #64748b; }
-    .streak-lbl { font-size: 11px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 4px 10px; border-radius: 12px; }
 
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
@@ -222,22 +240,47 @@
       else { renderSyllabusSheet(currentActiveTab); }
     }
 
+    // FUNCTION TO CHECK IF A DATE IS IN THE PAST
+    function isPastDate(year, month, day) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkDate = new Date(year, month - 1, day);
+      return checkDate < today;
+    }
+
     function generateCalendar(cardId, progressId, statsId, keyPrefix, isStudy = false) {
       const calendar = document.getElementById(cardId); if (!calendar) return; calendar.innerHTML = '';
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+      
       for (let day = 1; day <= daysInMonth; day++) {
-        const dayBox = document.createElement('div'); dayBox.className = 'day'; dayBox.innerHTML = `${day}<br>`;
+        const dayBox = document.createElement('div'); dayBox.className = 'day'; dayBox.innerHTML = `${day}`;
+        
+        const label = document.createElement('label');
+        label.className = 'checkbox-container';
         const checkbox = document.createElement('input'); checkbox.type = 'checkbox';
+        label.appendChild(checkbox);
+
         const storageKey = `${keyPrefix}_${currentYear}_${currentMonth}_${day}`;
         checkbox.checked = getLocalItem(storageKey) === 'true';
-        if (checkbox.checked) dayBox.classList.add('checked');
-        if (new Date().getFullYear() === currentYear && (new Date().getMonth() + 1) === currentMonth && new Date().getDate() === day) dayBox.classList.add('today');
         
-        checkbox.onchange = () => {
-          saveLocalItem(storageKey, checkbox.checked);
-          dayBox.classList.toggle('checked', checkbox.checked);
-          updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
-        };
+        const isLocked = isPastDate(currentYear, currentMonth, day);
+        
+        if (checkbox.checked) dayBox.classList.add('checked');
+        if (isLocked) dayBox.classList.add('locked');
+        
+        if (new Date().getFullYear() === currentYear && (new Date().getMonth() + 1) === currentMonth && new Date().getDate() === day) {
+          dayBox.classList.add('today');
+        }
+        
+        if (isLocked) {
+          checkbox.disabled = true;
+        } else {
+          checkbox.onchange = () => {
+            saveLocalItem(storageKey, checkbox.checked);
+            dayBox.classList.toggle('checked', checkbox.checked);
+            updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+          };
+        }
         
         if (isStudy) {
           const range = document.createElement('input'); range.type = 'range'; range.min = 0; range.max = 8; range.step = 1;
@@ -245,17 +288,29 @@
           const rangeDiv = document.createElement('div'); rangeDiv.style.display = 'flex'; rangeDiv.style.alignItems = 'center'; rangeDiv.style.gap = '4px';
           const rangeLabel = document.createElement('div'); rangeLabel.style.fontSize = '10px'; rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
           
-          range.oninput = () => {
-            saveLocalItem(hoursKey, range.value);
-            rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
-            if(parseInt(range.value, 10) > 0 && !checkbox.checked) { checkbox.checked = true; saveLocalItem(storageKey, 'true'); dayBox.classList.add('checked'); }
-            updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
-          };
+          if (isLocked) {
+            range.disabled = true;
+          } else {
+            range.oninput = () => {
+              saveLocalItem(hoursKey, range.value);
+              rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
+              if(parseInt(range.value, 10) > 0 && !checkbox.checked) { 
+                checkbox.checked = true; 
+                saveLocalItem(storageKey, 'true'); 
+                dayBox.classList.add('checked'); 
+              }
+              updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+            };
+          }
           rangeDiv.onclick = (e) => e.stopPropagation();
           rangeDiv.appendChild(rangeLabel); rangeDiv.appendChild(range); dayBox.appendChild(rangeDiv);
         }
-        dayBox.onclick = (e) => { if (e.target !== checkbox) { checkbox.checked = !checkbox.checked; checkbox.onchange(); } };
-        dayBox.appendChild(checkbox); calendar.appendChild(dayBox);
+        
+        if (!isLocked) {
+          dayBox.onclick = (e) => { if (e.target !== checkbox && e.target.type !== 'range') { checkbox.checked = !checkbox.checked; checkbox.onchange(); } };
+        }
+        
+        dayBox.appendChild(label); calendar.appendChild(dayBox);
       }
       updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
     }
