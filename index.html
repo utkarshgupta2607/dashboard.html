@@ -124,7 +124,6 @@
           <div class="progress-container">
             <div class="mini-circle" id="meditationProgress">0%</div>
             <div class="stats-lbl" id="meditationStats">0 / 0</div>
-            <div class="streak-lbl" id="meditationStreak">🔥 0d</div>
           </div>
         </div>
         <div class="card">
@@ -133,7 +132,6 @@
           <div class="progress-container">
             <div class="mini-circle" id="workoutProgress">0%</div>
             <div class="stats-lbl" id="workoutStats">0 / 0</div>
-            <div class="streak-lbl" id="workoutStreak">🔥 0d</div>
           </div>
         </div>
       </div>
@@ -145,7 +143,6 @@
           <div class="progress-container">
             <div class="mini-circle" id="studyProgress">0%</div>
             <div class="stats-lbl" id="studyStats">0h / 0h</div>
-            <div class="streak-lbl" id="studyStreak">🔥 0d</div>
           </div>
         </div>
       </div>
@@ -169,11 +166,9 @@
   </div>
 
   <script>
-    const API_URL = `https://api.jsonbin.io/v3/b/65b53d09dc746540189b7cf3`;
-    const MASTER_KEY = "$2a$10$W1eA9S7iOnv9m3RByI0HduoEqK9p4YpAghuYfX1K9wV9yB5Vl96uq"; 
-
-    let cloudDataCache = {};
-    let currentMonth = 5; let currentYear = 2026; let currentActiveTab = 'self';
+    let currentMonth = new Date().getMonth() + 1; 
+    let currentYear = new Date().getFullYear(); 
+    let currentActiveTab = 'self';
     let timerInterval = null; let totalSeconds = 0;
 
     const syllabusData = {
@@ -183,23 +178,8 @@
       reasoning: ["Alphanumeric Series", "Blood Relation", "Mathematical Operations", "Word Building", "Logical Sequence Test", "Inserting the Missing", "Clock", "Paper Folding & Cutting", "Counting of Figures", "Coding Decoding", "Number Series", "Image", "Calendar", "Dice", "Alphabet Test", "Inequality", "Analogy", "Classification", "Logical Venn Diagram", "Syllogism", "Distance & Direction", "Seating Arrangement", "Puzzle", "Ranking Order", "Data Sufficiency", "Statement Based Question", "Cube & Cuboid"]
     };
 
-    async function loadCloudData() {
-      try {
-        const res = await fetch(`${API_URL}/latest?meta=false`, { headers: { "X-Master-Key": MASTER_KEY } });
-        if(res.ok) { cloudDataCache = await res.json(); }
-      } catch(e) { cloudDataCache = JSON.parse(localStorage.getItem('cgl_fallback') || '{}'); }
-      refreshUI();
-    }
-
-    async function saveCloudData(key, value) {
-      cloudDataCache[key] = value.toString();
-      localStorage.setItem('cgl_fallback', JSON.stringify(cloudDataCache));
-      try {
-        await fetch(API_URL, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(cloudDataCache) });
-      } catch(e) {}
-    }
-
-    function getCloudItem(key) { return cloudDataCache[key] || null; }
+    function getLocalItem(key) { return localStorage.getItem(key) || null; }
+    function saveLocalItem(key, value) { localStorage.setItem(key, value.toString()); }
     
     function startDigitalClock() { setInterval(() => { const now = new Date(); let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0'); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; document.getElementById('liveClock').innerText = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`; }, 1000); }
     function setupHeader() { const now = new Date(); const hrs = now.getHours(); let greet = "Good Morning"; if (hrs >= 12 && hrs < 17) greet = "Good Afternoon"; else if (hrs >= 17 && hrs < 22) greet = "Good Evening"; else if (hrs >= 22 || hrs < 5) greet = "Hello"; document.getElementById('greetingText').innerText = `${greet}, Utkarsh!`; }
@@ -242,34 +222,34 @@
       else { renderSyllabusSheet(currentActiveTab); }
     }
 
-    function generateCalendar(cardId, progressId, statsId, keyPrefix, streakId, isStudy = false) {
+    function generateCalendar(cardId, progressId, statsId, keyPrefix, isStudy = false) {
       const calendar = document.getElementById(cardId); if (!calendar) return; calendar.innerHTML = '';
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
       for (let day = 1; day <= daysInMonth; day++) {
         const dayBox = document.createElement('div'); dayBox.className = 'day'; dayBox.innerHTML = `${day}<br>`;
         const checkbox = document.createElement('input'); checkbox.type = 'checkbox';
         const storageKey = `${keyPrefix}_${currentYear}_${currentMonth}_${day}`;
-        checkbox.checked = getCloudItem(storageKey) === 'true';
+        checkbox.checked = getLocalItem(storageKey) === 'true';
         if (checkbox.checked) dayBox.classList.add('checked');
         if (new Date().getFullYear() === currentYear && (new Date().getMonth() + 1) === currentMonth && new Date().getDate() === day) dayBox.classList.add('today');
         
-        checkbox.onchange = async () => {
-          await saveCloudData(storageKey, checkbox.checked);
+        checkbox.onchange = () => {
+          saveLocalItem(storageKey, checkbox.checked);
           dayBox.classList.toggle('checked', checkbox.checked);
-          updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy);
+          updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
         };
         
         if (isStudy) {
           const range = document.createElement('input'); range.type = 'range'; range.min = 0; range.max = 8; range.step = 1;
-          const hoursKey = storageKey + '_hours'; range.value = parseInt(getCloudItem(hoursKey) || '0', 10);
+          const hoursKey = storageKey + '_hours'; range.value = parseInt(getLocalItem(hoursKey) || '0', 10);
           const rangeDiv = document.createElement('div'); rangeDiv.style.display = 'flex'; rangeDiv.style.alignItems = 'center'; rangeDiv.style.gap = '4px';
           const rangeLabel = document.createElement('div'); rangeLabel.style.fontSize = '10px'; rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
           
-          range.oninput = async () => {
-            await saveCloudData(hoursKey, range.value);
+          range.oninput = () => {
+            saveLocalItem(hoursKey, range.value);
             rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
-            if(parseInt(range.value, 10) > 0 && !checkbox.checked) { checkbox.checked = true; await saveCloudData(storageKey, 'true'); dayBox.classList.add('checked'); }
-            updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy);
+            if(parseInt(range.value, 10) > 0 && !checkbox.checked) { checkbox.checked = true; saveLocalItem(storageKey, 'true'); dayBox.classList.add('checked'); }
+            updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
           };
           rangeDiv.onclick = (e) => e.stopPropagation();
           rangeDiv.appendChild(rangeLabel); rangeDiv.appendChild(range); dayBox.appendChild(rangeDiv);
@@ -277,10 +257,10 @@
         dayBox.onclick = (e) => { if (e.target !== checkbox) { checkbox.checked = !checkbox.checked; checkbox.onchange(); } };
         dayBox.appendChild(checkbox); calendar.appendChild(dayBox);
       }
-      updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy);
+      updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
     }
 
-    function updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy) {
+    function updateProgress(cardId, progressId, statsId, keyPrefix, isStudy) {
       const checkboxes = document.querySelectorAll(`#${cardId} input[type="checkbox"]`);
       const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
       let percent = checkboxes.length ? Math.round((checked / checkboxes.length) * 100) : 0;
@@ -305,7 +285,7 @@
       
       syllabusData[subjectKey].forEach((chapterName, index) => {
         const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`;
-        const savedStatus = getCloudItem(storageKey) || 'not_started';
+        const savedStatus = getLocalItem(storageKey) || 'not_started';
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td>
@@ -322,14 +302,14 @@
       calculateSyllabusProgress(subjectKey);
     }
 
-    async function saveSyllabusStatus(subjectKey, chNo, selectElement) {
-      await saveCloudData(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value);
+    function saveSyllabusStatus(subjectKey, chNo, selectElement) {
+      saveLocalItem(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value);
       selectElement.setAttribute('data-status', selectElement.value);
       calculateSyllabusProgress(subjectKey);
     }
 
     function calculateSyllabusProgress(subjectKey) {
-      let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getCloudItem(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; });
+      let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getLocalItem(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; });
       const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0;
       document.getElementById('syllabusCircle').innerText = `${percent}%`;
       document.getElementById('syllabusCircle').style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
@@ -338,16 +318,15 @@
 
     function reloadCalendars() {
       document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
-      generateCalendar('meditationCalendar', 'meditationProgress', 'meditationStats', 'meditation', 'meditationStreak', false);
-      generateCalendar('workoutCalendar', 'workoutProgress', 'workoutStats', 'workout', 'workoutStreak', false);
-      generateCalendar('studyCalendar', 'studyProgress', 'studyStats', 'study', 'studyStreak', true);
+      generateCalendar('meditationCalendar', 'meditationProgress', 'meditationStats', 'meditation', false);
+      generateCalendar('workoutCalendar', 'workoutProgress', 'workoutStats', 'workout', false);
+      generateCalendar('studyCalendar', 'studyProgress', 'studyStats', 'study', true);
     }
 
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
-    startDigitalClock(); setupHeader(); loadCloudData();
-    setInterval(loadCloudData, 15000);
+    startDigitalClock(); setupHeader(); refreshUI();
   </script>
 </body>
 </html>
