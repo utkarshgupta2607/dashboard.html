@@ -204,8 +204,11 @@
     function saveItemValue(key, value) { 
       localStorage.setItem(key, value.toString());
       cloudDataCache[key] = value.toString();
+      triggerCloudPush();
+    }
+
+    function triggerCloudPush() {
       clearTimeout(syncTimeout);
-      // FIXED: Instant local response + 500ms rapid background push to database
       syncTimeout = setTimeout(async () => {
         try {
           await fetch(API_URL, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(cloudDataCache) });
@@ -219,7 +222,8 @@
         if(res.ok) { 
           cloudDataCache = await res.json(); 
           for (let key in cloudDataCache) { localStorage.setItem(key, cloudDataCache[key]); }
-          refreshUI(); // FIXED: Forcefully updates the screen live immediately when data arrives
+          refreshUI();
+          syncStopwatchFromCloud(); // FIXED: Forcefully sync stopwatch state from server
         }
       } catch(e) {}
     }
@@ -227,15 +231,25 @@
     function startDigitalClock() { setInterval(() => { const now = new Date(); let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0'); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; document.getElementById('liveClock').innerText = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`; }, 1000); }
     function setupHeader() { const now = new Date(); const hrs = now.getHours(); let greet = "Good Morning"; if (hrs >= 12 && hrs < 17) greet = "Good Afternoon"; else if (hrs >= 17 && hrs < 22) greet = "Good Evening"; else if (hrs >= 22 || hrs < 5) greet = "Hello"; document.getElementById('greetingText').innerText = `${greet}, Utkarsh!`; }
 
+    // FIXED FULL CLOUD PERSISTENT STOPWATCH ENGINE
     function initStopwatch() {
-      isTimerRunning = localStorage.getItem('sw_running') === 'true';
-      elapsedTimeBefore = parseInt(localStorage.getItem('sw_elapsed') || '0', 10);
-      startTime = parseInt(localStorage.getItem('sw_start_time') || '0', 10);
-      if (isTimerRunning) {
-        document.getElementById("startStopBtn").innerText = "Pause";
-        document.getElementById("startStopBtn").style.background = "#94a3b8";
+      syncStopwatchFromCloud();
+    }
+
+    function syncStopwatchFromCloud() {
+      isTimerRunning = getItemValue('sw_running') === 'true';
+      elapsedTimeBefore = parseInt(getItemValue('sw_elapsed') || '0', 10);
+      startTime = parseInt(getItemValue('sw_start_time') || '0', 10);
+
+      const btn = document.getElementById("startStopBtn");
+      if (isTimerRunning && startTime > 0) {
+        btn.innerText = "Pause"; btn.style.background = "#94a3b8";
         startClockInterval();
-      } else { updateTimerDisplay(elapsedTimeBefore); }
+      } else {
+        clearInterval(clockInterval);
+        btn.innerText = "Start"; btn.style.background = "#ea580c";
+        updateTimerDisplay(elapsedTimeBefore);
+      }
     }
 
     function toggleTimer() {
@@ -243,19 +257,30 @@
       if (isTimerRunning) {
         let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
         isTimerRunning = false; elapsedTimeBefore = currentElapsed;
+        
         localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
-        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "#ea580c"; updateTimerDisplay(elapsedTimeBefore);
+        cloudDataCache['sw_running'] = 'false'; cloudDataCache['sw_elapsed'] = elapsedTimeBefore.toString();
+        
+        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "#ea580c";
+        updateTimerDisplay(elapsedTimeBefore);
       } else {
         isTimerRunning = true; startTime = Date.now();
+        
         localStorage.setItem('sw_running', 'true'); localStorage.setItem('sw_start_time', startTime.toString()); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
+        cloudDataCache['sw_running'] = 'true'; cloudDataCache['sw_start_time'] = startTime.toString(); cloudDataCache['sw_elapsed'] = elapsedTimeBefore.toString();
+        
         btn.innerText = "Pause"; btn.style.background = "#94a3b8"; startClockInterval();
       }
+      triggerCloudPush(); // FIXED: Push stopwatch status instantly to cloud on tap
     }
 
     function resetTimer() {
       isTimerRunning = false; clearInterval(clockInterval); elapsedTimeBefore = 0; startTime = 0;
       localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', '0'); localStorage.setItem('sw_start_time', '0');
-      const btn = document.getElementById("startStopBtn"); btn.innerText = "Start"; btn.style.background = "#ea580c"; updateTimerDisplay(0);
+      cloudDataCache['sw_running'] = 'false'; cloudDataCache['sw_elapsed'] = '0'; cloudDataCache['sw_start_time'] = '0';
+      const btn = document.getElementById("startStopBtn"); btn.innerText = "Start"; btn.style.background = "#ea580c";
+      updateTimerDisplay(0);
+      triggerCloudPush();
     }
 
     function startClockInterval() { clearInterval(clockInterval); clockInterval = setInterval(() => { let liveElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore; updateTimerDisplay(liveElapsed); }, 500); }
@@ -410,9 +435,8 @@
 
     startDigitalClock(); setupHeader(); initStopwatch();
     
-    // FIXED: Load server data instantly on page open + check for changes every 8 seconds
     loadCloudData();
-    setInterval(loadCloudData, 8000);
+    setInterval(loadCloudData, 8000); // Polls every 8 seconds for real-time background tracking across screens
   </script>
 </body>
 </html>
