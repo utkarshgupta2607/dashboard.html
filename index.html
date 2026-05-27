@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission CGL 2026 Dashboard - Utkarsh</title>
+  <style>
+    :root {
+      --sidebar-gradient: linear-gradient(180deg, #1e3a8a, #0f172a); 
+      --checked-gradient: linear-gradient(135deg, #11998e, #38ef7d); 
+      --day-bg-gradient: linear-gradient(180deg, #f9fafb, #f1f5f9);
+      --text-dark: #1e293b; --text-light: #ffffff;
+    }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #f8fafc; width: 100%; overflow: hidden; }
+    
+    .sidebar { width: 260px; background: var(--sidebar-gradient); color: var(--text-light); padding: 30px; box-shadow: 4px 0 25px rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: center; z-index: 10; }
+    .sidebar h2 { margin-top: 0; margin-bottom: 35px; font-size: 20px; font-weight: 800; letter-spacing: 1.5px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 15px; width: 100%; }
+    .sidebar-section-title { align-self: flex-start; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 15px 0 5px 5px; font-weight: 700; }
+    .task { width: 100%; background: rgba(255,255,255,0.05); padding: 12px 16px; margin: 5px 0; border-radius: 10px; text-align: left; font-weight: 600; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; transition: all 0.2s ease; }
+    .task:hover { background: rgba(255,255,255,0.12); transform: translateX(3px); }
+    .task.active { background: #ffffff; color: #1e3a8a; box-shadow: 0 8px 15px rgba(0,0,0,0.05); font-weight: 700; }
+    
+    .main { flex: 1; display: flex; flex-direction: column; background: #f8fafc; overflow: hidden; }
+    .topbar { background: #ffffff; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; gap: 15px; }
+    .welcome-section { display: flex; flex-direction: column; gap: 4px; }
+    .digital-clock { font-size: 14px; font-weight: 800; color: #3b82f6; letter-spacing: 0.5px; background: #eff6ff; padding: 4px 10px; border-radius: 8px; align-self: flex-start; display: inline-block; }
+    .welcome-greet { margin: 0; font-size: 22px; color: var(--text-dark); font-weight: 800; }
+    .daily-quote { margin: 0; font-size: 13px; color: #64748b; font-style: italic; }
+    .calendar-controls { display: flex; align-items: center; gap: 15px; }
+    .calendar-controls h2 { margin: 0; font-size: 18px; color: var(--text-dark); font-weight: 700; min-width: 130px; text-align: center; }
+    .calendar-controls button { background: #ffffff; border: 1px solid #cbd5e1; color: #64748b; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .calendar-controls button:hover { background: #f1f5f9; }
+    
+    .cards-zone { flex: 1; padding: 40px; overflow-y: auto; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; }
+    .card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); display: flex; flex-direction: column; border: 1px solid #f1f5f9; }
+    .card h3 { margin-top: 0; margin-bottom: 20px; font-size: 17px; color: var(--text-dark); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .card h3::before { content: ''; width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: #3b82f6; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; }
+    .day { background: var(--day-bg-gradient); border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+    .day.checked { background: var(--checked-gradient); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(56, 239, 125, 0.2); }
+    .day.today { border: 2px solid #3b82f6; background: #fff; color: #3b82f6; font-weight: 700; }
+    .day.today::after { content: '●'; position: absolute; top: 2px; right: 5px; font-size: 7px; color: #3b82f6; }
+    input[type="checkbox"] { appearance: none; width: 14px; height: 14px; border: 2px solid #cbd5e1; border-radius: 4px; cursor: pointer; background: #fff; margin-top: 4px; }
+    .day.checked input[type="checkbox"] { border-color: rgba(255,255,255,0.8); background-color: rgba(255,255,255,0.2); }
+    input[type="range"] { width: 90%; height: 4px; appearance: none; background: rgba(0,0,0,0.05); border-radius: 10px; margin-top: 4px; }
+    input[type="range"]::-webkit-slider-thumb { appearance: none; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
+    
+    .timer-container { background: #fff7ed; border: 1px solid #ffedd5; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
+    .timer-display { font-size: 26px; font-weight: 800; color: #ea580c; font-family: monospace; margin-bottom: 10px; }
+    .timer-btn { background: #ea580c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 12px; margin: 0 4px; }
+    .timer-btn.reset { background: #94a3b8; }
+
+    .syllabus-layout { display: grid; grid-template-columns: 280px 1fr; gap: 30px; }
+    .syllabus-side-card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); border: 1px solid #f1f5f9; text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
+    .circle-progress { width: 110px; height: 110px; border-radius: 50%; background: conic-gradient(#38ef7d 0%, #f1f5f9 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 20px; color: var(--text-dark); margin: 15px 0; }
+    .syllabus-table-card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); border: 1px solid #f1f5f9; overflow-x: auto; }
+    .syllabus-table { width: 100%; border-collapse: collapse; min-width: 400px; }
+    .syllabus-table th { padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 13px; text-align: left; }
+    .syllabus-table td { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; color: var(--text-dark); font-size: 14px; font-weight: 600; }
+    .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 700; cursor: pointer; width: 100%; max-width: 150px; }
+    .status-select[data-status="not_started"] { background: #f1f5f9; color: #64748b; }
+    .status-select[data-status="in_progress"] { background: #eff6ff; color: #2563eb; }
+    .status-select[data-status="revision"] { background: #fffbeb; color: #d97706; }
+    .status-select[data-status="completed"] { background: #ecfdf5; color: #059669; }
+    .progress-container { margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .mini-circle { width: 35px; height: 35px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
+    .stats-lbl { font-size: 12px; font-weight: 700; color: #64748b; }
+    .streak-lbl { font-size: 11px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 4px 10px; border-radius: 12px; }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; overflow-y: auto; height: auto; }
+      .sidebar { width: 100%; padding: 15px; }
+      .sidebar h2 { margin-bottom: 15px; padding-bottom: 8px; font-size: 18px; }
+      .task { padding: 10px 14px; font-size: 13px; }
+      .topbar { padding: 15px 20px; flex-direction: column; text-align: center; }
+      .calendar-controls { width: 100%; justify-content: center; margin-top: 10px; }
+      .cards-zone { padding: 15px; }
+      .cards-grid, .syllabus-layout { grid-template-columns: 1fr; gap: 20px; }
+      .day { padding: 8px 2px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>MISSION CGL 2026</h2>
+    
+    <div class="timer-container">
+      <div class="timer-display" id="stopwatchDisplay">00:00:00</div>
+      <button class="timer-btn" id="startStopBtn" onclick="toggleTimer()">Start</button>
+      <button class="timer-btn reset" onclick="resetTimer()">Reset</button>
+    </div>
+
+    <div class="sidebar-section-title">Daily Tracking</div>
+    <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
+    <div class="task" id="tab-study" onclick="switchView('study')">Study Architecture</div>
+    <div class="sidebar-section-title">Surya 2.0 Syllabus</div>
+    <div class="task" id="tab-english" onclick="switchView('english')">English Grammar</div>
+    <div class="task" id="tab-math" onclick="switchView('math')">Advanced Maths</div>
+    <div class="task" id="tab-science" onclick="switchView('science')">Science Module</div>
+    <div class="task" id="tab-reasoning" onclick="switchView('reasoning')">Reasoning Matrix</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="welcome-section">
+        <div class="digital-clock" id="liveClock">00:00:00 AM</div>
+        <h1 class="welcome-greet" id="greetingText">Hello, Utkarsh!</h1>
+        <p class="daily-quote" id="quoteText">"Your competition is preparing while you rest. Stay active."</p>
+      </div>
+      <div class="calendar-controls" id="calControls">
+        <button onclick="prevMonth()">◀</button>
+        <h2 id="monthTitle">May 2026</h2>
+        <button onclick="nextMonth()">▶</button>
+      </div>
+    </div>
+
+    <div class="cards-zone">
+      <div class="cards-grid" id="view-self">
+        <div class="card">
+          <h3>Meditation</h3>
+          <div class="calendar" id="meditationCalendar"></div>
+          <div class="progress-container">
+            <div class="mini-circle" id="meditationProgress">0%</div>
+            <div class="stats-lbl" id="meditationStats">0 / 0</div>
+            <div class="streak-lbl" id="meditationStreak">🔥 0d</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Workout</h3>
+          <div class="calendar" id="workoutCalendar"></div>
+          <div class="progress-container">
+            <div class="mini-circle" id="workoutProgress">0%</div>
+            <div class="stats-lbl" id="workoutStats">0 / 0</div>
+            <div class="streak-lbl" id="workoutStreak">🔥 0d</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-grid" id="view-study" style="display:none;">
+        <div class="card">
+          <h3>Study Core Sessions</h3>
+          <div class="calendar" id="studyCalendar"></div>
+          <div class="progress-container">
+            <div class="mini-circle" id="studyProgress">0%</div>
+            <div class="stats-lbl" id="studyStats">0h / 0h</div>
+            <div class="streak-lbl" id="studyStreak">🔥 0d</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="syllabus-layout" id="view-syllabus" style="display:none;">
+        <div class="syllabus-side-card">
+          <h3 id="syllabusSubjectTitle" style="margin:0;">Subject</h3>
+          <div class="circle-progress" id="syllabusCircle">0%</div>
+          <div class="stats-lbl" id="syllabusCountText">0 of 0 Completed</div>
+        </div>
+        <div class="syllabus-table-card">
+          <table class="syllabus-table">
+            <thead>
+              <tr><th style="width: 15%">Ch No.</th><th style="width: 55%">Chapter Name</th><th style="width: 30%">Status</th></tr>
+            </thead>
+            <tbody id="syllabusTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = `https://api.jsonbin.io/v3/b/65b53d09dc746540189b7cf3`;
+    const MASTER_KEY = "$2a$10$W1eA9S7iOnv9m3RByI0HduoEqK9p4YpAghuYfX1K9wV9yB5Vl96uq"; 
+
+    let cloudDataCache = {};
+    let currentMonth = 5; let currentYear = 2026; let currentActiveTab = 'self';
+    let timerInterval = null; let totalSeconds = 0;
+
+    const syllabusData = {
+      english: ["Parts of Speech", "Phrases", "Clauses", "Noun", "Subject Verb Agreement", "Pronoun", "Adjective", "Determiners", "Articles", "Verb", "Modals", "Tenses", "Conditional", "Mood", "Gerund", "Participle", "Infinitive", "Adverb", "Conjunction", "Preposition", "Phrasal Verbs", "Question Tag", "Voice", "Narration", "Parajumbles", "Cloze Test", "Reading Comprehension", "Fill In The Blanks"],
+      math: ["Number System", "Simplification", "HCF & LCM", "Algebra", "Quadratic Equations", "Trigonometry", "Maximum & Minimum Value", "Height & Distance", "Geometry", "Coordinate Geometry", "Mensuration", "Statistics", "Probability"],
+      science: ["Cell", "Digestive System", "Circulatory System", "Respiratory System", "Brain & Nervous System", "Excretory System", "Blood", "Vitamins", "Nutrition", "Disease", "Endocrine Glands", "Skeleton System", "Reproduction", "Plant Kingdom", "Animal Kingdom", "Tissues", "Matter & Atom", "Metals & Non Metals", "Acid Base & Salt", "Carbon & Its Compound", "Periodic Table", "Chemical Reaction", "Chemistry in Every Day Life & Law of Gases", "Motion & Force", "Gravitation Work Energy", "Optics & Human Eye", "Sound", "Electricity", "Magnetic Effect & Heating Effect of Current", "Doubt & Practice Session"],
+      reasoning: ["Alphanumeric Series", "Blood Relation", "Mathematical Operations", "Word Building", "Logical Sequence Test", "Inserting the Missing", "Clock", "Paper Folding & Cutting", "Counting of Figures", "Coding Decoding", "Number Series", "Image", "Calendar", "Dice", "Alphabet Test", "Inequality", "Analogy", "Classification", "Logical Venn Diagram", "Syllogism", "Distance & Direction", "Seating Arrangement", "Puzzle", "Ranking Order", "Data Sufficiency", "Statement Based Question", "Cube & Cuboid"]
+    };
+
+    async function loadCloudData() {
+      try {
+        const res = await fetch(`${API_URL}/latest?meta=false`, { headers: { "X-Master-Key": MASTER_KEY } });
+        if(res.ok) { cloudDataCache = await res.json(); }
+      } catch(e) { cloudDataCache = JSON.parse(localStorage.getItem('cgl_fallback') || '{}'); }
+      refreshUI();
+    }
+
+    async function saveCloudData(key, value) {
+      cloudDataCache[key] = value.toString();
+      localStorage.setItem('cgl_fallback', JSON.stringify(cloudDataCache));
+      try {
+        await fetch(API_URL, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(cloudDataCache) });
+      } catch(e) {}
+    }
+
+    function getCloudItem(key) { return cloudDataCache[key] || null; }
+    
+    function startDigitalClock() { setInterval(() => { const now = new Date(); let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0'); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; document.getElementById('liveClock').innerText = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`; }, 1000); }
+    function setupHeader() { const now = new Date(); const hrs = now.getHours(); let greet = "Good Morning"; if (hrs >= 12 && hrs < 17) greet = "Good Afternoon"; else if (hrs >= 17 && hrs < 22) greet = "Good Evening"; else if (hrs >= 22 || hrs < 5) greet = "Hello"; document.getElementById('greetingText').innerText = `${greet}, Utkarsh!`; }
+
+    function toggleTimer() {
+      const btn = document.getElementById("startStopBtn");
+      if (timerInterval) {
+        clearInterval(timerInterval); timerInterval = null; btn.innerText = "Start"; btn.style.background = "#ea580c";
+      } else {
+        btn.innerText = "Pause"; btn.style.background = "#94a3b8";
+        timerInterval = setInterval(() => { totalSeconds++; updateTimerDisplay(); }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval); timerInterval = null; totalSeconds = 0; updateTimerDisplay();
+      const btn = document.getElementById("startStopBtn"); btn.innerText = "Start"; btn.style.background = "#ea580c";
+    }
+
+    function updateTimerDisplay() {
+      const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(totalSeconds % 60).padStart(2, '0');
+      document.getElementById("stopwatchDisplay").innerText = `${hrs}:${mins}:${secs}`;
+    }
+
+    function switchView(viewKey) {
+      currentActiveTab = viewKey;
+      document.querySelectorAll('.task').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${viewKey}`).classList.add('active');
+      document.getElementById('view-self').style.display = (viewKey === 'self') ? 'grid' : 'none';
+      document.getElementById('view-study').style.display = (viewKey === 'study') ? 'grid' : 'none';
+      document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study') ? 'grid' : 'none';
+      document.getElementById('calControls').style.display = (viewKey === 'self' || viewKey === 'study') ? 'flex' : 'none';
+      refreshUI();
+    }
+
+    function refreshUI() {
+      if (currentActiveTab === 'self' || currentActiveTab === 'study') { reloadCalendars(); } 
+      else { renderSyllabusSheet(currentActiveTab); }
+    }
+
+    function generateCalendar(cardId, progressId, statsId, keyPrefix, streakId, isStudy = false) {
+      const calendar = document.getElementById(cardId); if (!calendar) return; calendar.innerHTML = '';
+      const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayBox = document.createElement('div'); dayBox.className = 'day'; dayBox.innerHTML = `${day}<br>`;
+        const checkbox = document.createElement('input'); checkbox.type = 'checkbox';
+        const storageKey = `${keyPrefix}_${currentYear}_${currentMonth}_${day}`;
+        checkbox.checked = getCloudItem(storageKey) === 'true';
+        if (checkbox.checked) dayBox.classList.add('checked');
+        if (new Date().getFullYear() === currentYear && (new Date().getMonth() + 1) === currentMonth && new Date().getDate() === day) dayBox.classList.add('today');
+        
+        checkbox.onchange = async () => {
+          await saveCloudData(storageKey, checkbox.checked);
+          dayBox.classList.toggle('checked', checkbox.checked);
+          updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy);
+        };
+        
+        if (isStudy) {
+          const range = document.createElement('input'); range.type = 'range'; range.min = 0; range.max = 8; range.step = 1;
+          const hoursKey = storageKey + '_hours'; range.value = parseInt(getCloudItem(hoursKey) || '0', 10);
+          const rangeDiv = document.createElement('div'); rangeDiv.style.display = 'flex'; rangeDiv.style.alignItems = 'center'; rangeDiv.style.gap = '4px';
+          const rangeLabel = document.createElement('div'); rangeLabel.style.fontSize = '10px'; rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
+          
+          range.oninput = async () => {
+            await saveCloudData(hoursKey, range.value);
+            rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
+            if(parseInt(range.value, 10) > 0 && !checkbox.checked) { checkbox.checked = true; await saveCloudData(storageKey, 'true'); dayBox.classList.add('checked'); }
+            updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy);
+          };
+          rangeDiv.onclick = (e) => e.stopPropagation();
+          rangeDiv.appendChild(rangeLabel); rangeDiv.appendChild(range); dayBox.appendChild(rangeDiv);
+        }
+        dayBox.onclick = (e) => { if (e.target !== checkbox) { checkbox.checked = !checkbox.checked; checkbox.onchange(); } };
+        dayBox.appendChild(checkbox); calendar.appendChild(dayBox);
+      }
+      updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy);
+    }
+
+    function updateProgress(cardId, progressId, statsId, keyPrefix, streakId, isStudy) {
+      const checkboxes = document.querySelectorAll(`#${cardId} input[type="checkbox"]`);
+      const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+      let percent = checkboxes.length ? Math.round((checked / checkboxes.length) * 100) : 0;
+      if (isStudy) {
+        const ranges = document.querySelectorAll(`#${cardId} input[type="range"]`);
+        let totalHours = 0; ranges.forEach(r => totalHours += parseInt(r.value || '0', 10));
+        percent = ranges.length ? Math.round((totalHours / (ranges.length * 8)) * 100) : 0;
+        document.getElementById(progressId).innerText = percent + '%';
+        document.getElementById(progressId).style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
+        document.getElementById(statsId).innerText = `${totalHours}h / ${ranges.length * 8}h`;
+      } else {
+        document.getElementById(progressId).innerText = percent + '%';
+        document.getElementById(progressId).style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
+        document.getElementById(statsId).innerText = `${checked} / ${checkboxes.length}`;
+      }
+    }
+
+    function renderSyllabusSheet(subjectKey) {
+      const titles = { english: "English", math: "Advanced Maths", science: "Science", reasoning: "Reasoning" };
+      document.getElementById('syllabusSubjectTitle').innerText = titles[subjectKey];
+      const tbody = document.getElementById('syllabusTableBody'); tbody.innerHTML = '';
+      
+      syllabusData[subjectKey].forEach((chapterName, index) => {
+        const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`;
+        const savedStatus = getCloudItem(storageKey) || 'not_started';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td>
+          <td>
+            <select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)">
+              <option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option>
+              <option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option>
+              <option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option>
+              <option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option>
+            </select>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+      calculateSyllabusProgress(subjectKey);
+    }
+
+    async function saveSyllabusStatus(subjectKey, chNo, selectElement) {
+      await saveCloudData(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value);
+      selectElement.setAttribute('data-status', selectElement.value);
+      calculateSyllabusProgress(subjectKey);
+    }
+
+    function calculateSyllabusProgress(subjectKey) {
+      let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getCloudItem(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; });
+      const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0;
+      document.getElementById('syllabusCircle').innerText = `${percent}%`;
+      document.getElementById('syllabusCircle').style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
+      document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`;
+    }
+
+    function reloadCalendars() {
+      document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+      generateCalendar('meditationCalendar', 'meditationProgress', 'meditationStats', 'meditation', 'meditationStreak', false);
+      generateCalendar('workoutCalendar', 'workoutProgress', 'workoutStats', 'workout', 'workoutStreak', false);
+      generateCalendar('studyCalendar', 'studyProgress', 'studyStats', 'study', 'studyStreak', true);
+    }
+
+    function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
+    function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
+
+    startDigitalClock(); setupHeader(); loadCloudData();
+    setInterval(loadCloudData, 15000);
+  </script>
+</body>
+</html>
