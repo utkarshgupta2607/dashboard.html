@@ -38,7 +38,7 @@
     .card h3::before { content: ''; width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: #3b82f6; }
     
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; }
-    .day { background: var(--day-bg-gradient); border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: all 0.2s; }
+    .day { background: var(--day-bg-gradient); border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: all 0.2s; min-height: 55px; }
     
     .day.checked { background: var(--checked-gradient); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(56, 239, 125, 0.3); }
     .day.locked { cursor: not-allowed; opacity: 0.85; background: #e2e8f0; color: #94a3b8; border-style: dashed; }
@@ -46,7 +46,7 @@
     .day.today { border: 2px solid #3b82f6; background: #fff; color: #3b82f6; font-weight: 700; }
     .day.today::after { content: '●'; position: absolute; top: 2px; right: 5px; font-size: 7px; color: #3b82f6; }
     
-    .checkbox-container { display: inline-block; position: relative; width: 18px; height: 18px; margin-top: 6px; }
+    .checkbox-container { display: inline-block; position: relative; width: 18px; height: 18px; margin-top: 4px; }
     input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 6px; cursor: pointer; background: #fff; margin: 0; display: block; transition: all 0.15s; }
     .day.checked input[type="checkbox"] { background: #fff; border-color: #fff; }
     
@@ -55,9 +55,13 @@
     .day.locked .checkbox-container::after { color: #0d7a71; }
     .day.locked input[type="checkbox"] { cursor: not-allowed; background: #cbd5e1; border-color: #cbd5e1; }
 
-    input[type="range"] { width: 90%; height: 4px; appearance: none; background: rgba(0,0,0,0.05); border-radius: 10px; margin-top: 4px; }
-    input[type="range"]::-webkit-slider-thumb { appearance: none; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
-    .day.locked input[type="range"] { cursor: not-allowed; opacity: 0.5; }
+    /* NEW: Plus Minus Counter Buttons Design */
+    .counter-container { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; background: rgba(0,0,0,0.03); padding: 2px 4px; border-radius: 6px; width: 90%; box-sizing: border-box; }
+    .day.checked .counter-container { background: rgba(255,255,255,0.15); }
+    .counter-btn { background: #475569; color: white; border: none; font-size: 11px; font-weight: 900; width: 16px; height: 16px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; }
+    .day.checked .counter-btn { background: white; color: #11998e; }
+    .counter-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .counter-value { font-size: 11px; font-weight: 700; min-width: 18px; text-align: center; }
     
     .timer-container { background: #fff7ed; border: 1px solid #ffedd5; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
     .timer-display { font-size: 26px; font-weight: 800; color: #ea580c; font-family: monospace; margin-bottom: 10px; }
@@ -178,7 +182,6 @@
   </div>
 
   <script>
-    // SECURE INTERNET CLOUD STORAGE KEY
     const API_URL = `https://api.jsonbin.io/v3/b/65b53d09dc746540189b7cf3`;
     const MASTER_KEY = "$2a$10$W1eA9S7iOnv9m3RByI0HduoEqK9p4YpAghuYfX1K9wV9yB5Vl96uq"; 
 
@@ -187,7 +190,12 @@
     let currentMonth = new Date().getMonth() + 1; 
     let currentYear = new Date().getFullYear(); 
     let currentActiveTab = 'self';
-    let timerInterval = null; let totalSeconds = 0;
+    
+    // BACKGROUND PERSISTENT STOPWATCH VARIABLES
+    let isTimerRunning = false;
+    let startTime = 0;
+    let elapsedTimeBefore = 0;
+    let clockInterval = null;
 
     const syllabusData = {
       english: ["Parts of Speech", "Phrases", "Clauses", "Noun", "Subject Verb Agreement", "Pronoun", "Adjective", "Determiners", "Articles", "Verb", "Modals", "Tenses", "Conditional", "Mood", "Gerund", "Participle", "Infinitive", "Adverb", "Conjunction", "Preposition", "Phrasal Verbs", "Question Tag", "Voice", "Narration", "Parajumbles", "Cloze Test", "Reading Comprehension", "Fill In The Blanks"],
@@ -196,26 +204,16 @@
       reasoning: ["Alphanumeric Series", "Blood Relation", "Mathematical Operations", "Word Building", "Logical Sequence Test", "Inserting the Missing", "Clock", "Paper Folding & Cutting", "Counting of Figures", "Coding Decoding", "Number Series", "Image", "Calendar", "Dice", "Alphabet Test", "Inequality", "Analogy", "Classification", "Logical Venn Diagram", "Syllogism", "Distance & Direction", "Seating Arrangement", "Puzzle", "Ranking Order", "Data Sufficiency", "Statement Based Question", "Cube & Cuboid"]
     };
 
-    // INSTANT LOCAL RETRIEVAL WITH CLOUD BACKUP
-    function getItemValue(key) { 
-      return localStorage.getItem(key) || cloudDataCache[key] || null; 
-    }
+    function getItemValue(key) { return localStorage.getItem(key) || cloudDataCache[key] || null; }
 
-    // INSTANT LOCAL SAVE + BACKGROUND INTERNET SYNC
     function saveItemValue(key, value) { 
       localStorage.setItem(key, value.toString());
       cloudDataCache[key] = value.toString();
-      
-      // Delay internet push by 1 second to bundle clicks together (No lagging!)
       clearTimeout(syncTimeout);
       syncTimeout = setTimeout(async () => {
         try {
-          await fetch(API_URL, { 
-            method: "PUT", 
-            headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, 
-            body: JSON.stringify(cloudDataCache) 
-          });
-        } catch(e) { console.log("Background sync paused. Saved locally."); }
+          await fetch(API_URL, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(cloudDataCache) });
+        } catch(e) {}
       }, 1200);
     }
 
@@ -224,37 +222,76 @@
         const res = await fetch(`${API_URL}/latest?meta=false`, { headers: { "X-Master-Key": MASTER_KEY } });
         if(res.ok) { 
           cloudDataCache = await res.json(); 
-          // Update local memory with cloud truth
-          for (let key in cloudDataCache) {
-            localStorage.setItem(key, cloudDataCache[key]);
-          }
+          for (let key in cloudDataCache) { localStorage.setItem(key, cloudDataCache[key]); }
         }
-      } catch(e) { console.log("Offline mode active."); }
+      } catch(e) {}
       refreshUI();
     }
     
     function startDigitalClock() { setInterval(() => { const now = new Date(); let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0'); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; document.getElementById('liveClock').innerText = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`; }, 1000); }
     function setupHeader() { const now = new Date(); const hrs = now.getHours(); let greet = "Good Morning"; if (hrs >= 12 && hrs < 17) greet = "Good Afternoon"; else if (hrs >= 17 && hrs < 22) greet = "Good Evening"; else if (hrs >= 22 || hrs < 5) greet = "Hello"; document.getElementById('greetingText').innerText = `${greet}, Utkarsh!`; }
 
+    // REAL TIME COMPATIBLE STOPWATCH SYSTEM (NEVER STOPS BACKGROUND)
+    function initStopwatch() {
+      isTimerRunning = localStorage.getItem('sw_running') === 'true';
+      elapsedTimeBefore = parseInt(localStorage.getItem('sw_elapsed') || '0', 10);
+      startTime = parseInt(localStorage.getItem('sw_start_time') || '0', 10);
+
+      if (isTimerRunning) {
+        document.getElementById("startStopBtn").innerText = "Pause";
+        document.getElementById("startStopBtn").style.background = "#94a3b8";
+        startClockInterval();
+      } else {
+        updateTimerDisplay(elapsedTimeBefore);
+      }
+    }
+
     function toggleTimer() {
       const btn = document.getElementById("startStopBtn");
-      if (timerInterval) {
-        clearInterval(timerInterval); timerInterval = null; btn.innerText = "Start"; btn.style.background = "#ea580c";
+      if (isTimerRunning) {
+        // Pause
+        let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
+        isTimerRunning = false;
+        elapsedTimeBefore = currentElapsed;
+        localStorage.setItem('sw_running', 'false');
+        localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
+        clearInterval(clockInterval);
+        btn.innerText = "Start"; btn.style.background = "#ea580c";
+        updateTimerDisplay(elapsedTimeBefore);
       } else {
+        // Start
+        isTimerRunning = true;
+        startTime = Date.now();
+        localStorage.setItem('sw_running', 'true');
+        localStorage.setItem('sw_start_time', startTime.toString());
+        localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
         btn.innerText = "Pause"; btn.style.background = "#94a3b8";
-        timerInterval = setInterval(() => { totalSeconds++; updateTimerDisplay(); }, 1000);
+        startClockInterval();
       }
     }
 
     function resetTimer() {
-      clearInterval(timerInterval); timerInterval = null; totalSeconds = 0; updateTimerDisplay();
+      isTimerRunning = false; clearInterval(clockInterval);
+      elapsedTimeBefore = 0; startTime = 0;
+      localStorage.setItem('sw_running', 'false');
+      localStorage.setItem('sw_elapsed', '0');
+      localStorage.setItem('sw_start_time', '0');
       const btn = document.getElementById("startStopBtn"); btn.innerText = "Start"; btn.style.background = "#ea580c";
+      updateTimerDisplay(0);
     }
 
-    function updateTimerDisplay() {
-      const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-      const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-      const secs = String(totalSeconds % 60).padStart(2, '0');
+    function startClockInterval() {
+      clearInterval(clockInterval);
+      clockInterval = setInterval(() => {
+        let liveElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
+        updateTimerDisplay(liveElapsed);
+      }, 500);
+    }
+
+    function updateTimerDisplay(totalSecs) {
+      const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0');
+      const secs = String(totalSecs % 60).padStart(2, '0');
       document.getElementById("stopwatchDisplay").innerText = `${hrs}:${mins}:${secs}`;
     }
 
@@ -275,8 +312,7 @@
     }
 
     function isPastDate(year, month, day) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
       const checkDate = new Date(year, month - 1, day);
       return checkDate < today;
     }
@@ -288,22 +324,17 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const dayBox = document.createElement('div'); dayBox.className = 'day'; dayBox.innerHTML = `${day}`;
         
-        const label = document.createElement('label');
-        label.className = 'checkbox-container';
+        const label = document.createElement('label'); label.className = 'checkbox-container';
         const checkbox = document.createElement('input'); checkbox.type = 'checkbox';
         label.appendChild(checkbox);
 
         const storageKey = `${keyPrefix}_${currentYear}_${currentMonth}_${day}`;
         checkbox.checked = getItemValue(storageKey) === 'true';
-        
         const isLocked = isPastDate(currentYear, currentMonth, day);
         
         if (checkbox.checked) dayBox.classList.add('checked');
         if (isLocked) dayBox.classList.add('locked');
-        
-        if (new Date().getFullYear() === currentYear && (new Date().getMonth() + 1) === currentMonth && new Date().getDate() === day) {
-          dayBox.classList.add('today');
-        }
+        if (new Date().getFullYear() === currentYear && (new Date().getMonth() + 1) === currentMonth && new Date().getDate() === day) dayBox.classList.add('today');
         
         if (isLocked) {
           checkbox.disabled = true;
@@ -315,32 +346,45 @@
           };
         }
         
+        // REPLACED: Range slider replaced with cool Plus/Minus Button Counters
         if (isStudy) {
-          const range = document.createElement('input'); range.type = 'range'; range.min = 0; range.max = 8; range.step = 1;
-          const hoursKey = storageKey + '_hours'; range.value = parseInt(getItemValue(hoursKey) || '0', 10);
-          const rangeDiv = document.createElement('div'); rangeDiv.style.display = 'flex'; rangeDiv.style.alignItems = 'center'; rangeDiv.style.gap = '4px';
-          const rangeLabel = document.createElement('div'); rangeLabel.style.fontSize = '10px'; rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
+          const hoursKey = storageKey + '_hours';
+          let initialHours = parseInt(getItemValue(hoursKey) || '0', 10);
+          
+          const counterDiv = document.createElement('div'); counterDiv.className = 'counter-container';
+          const minusBtn = document.createElement('button'); minusBtn.className = 'counter-btn'; minusBtn.innerText = '-';
+          const plusBtn = document.createElement('button'); plusBtn.className = 'counter-btn'; plusBtn.innerText = '+';
+          const hourValueSpan = document.createElement('span'); hourValueSpan.className = 'counter-value'; hourValueSpan.innerText = `${initialHours}h`;
           
           if (isLocked) {
-            range.disabled = true;
+            minusBtn.disabled = true; plusBtn.disabled = true;
           } else {
-            range.oninput = () => {
-              saveItemValue(hoursKey, range.value);
-              rangeLabel.innerText = range.value ? `${range.value}h` : '0h';
-              if(parseInt(range.value, 10) > 0 && !checkbox.checked) { 
-                checkbox.checked = true; 
-                saveItemValue(storageKey, 'true'); 
-                dayBox.classList.add('checked'); 
+            minusBtn.onclick = (e) => {
+              e.stopPropagation();
+              let cur = parseInt(getItemValue(hoursKey) || '0', 10);
+              if (cur > 0) {
+                cur--; saveItemValue(hoursKey, cur); hourValueSpan.innerText = `${cur}h`;
+                if(cur === 0 && checkbox.checked) { checkbox.checked = false; saveItemValue(storageKey, 'false'); dayBox.classList.remove('checked'); }
+                updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
               }
-              updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+            };
+            plusBtn.onclick = (e) => {
+              e.stopPropagation();
+              let cur = parseInt(getItemValue(hoursKey) || '0', 10);
+              if (cur < 8) {
+                cur++; saveItemValue(hoursKey, cur); hourValueSpan.innerText = `${cur}h`;
+                if(cur > 0 && !checkbox.checked) { checkbox.checked = true; saveItemValue(storageKey, 'true'); dayBox.classList.add('checked'); }
+                updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+              }
             };
           }
-          rangeDiv.onclick = (e) => e.stopPropagation();
-          rangeDiv.appendChild(rangeLabel); rangeDiv.appendChild(range); dayBox.appendChild(rangeDiv);
+          
+          counterDiv.appendChild(minusBtn); counterDiv.appendChild(hourValueSpan); counterDiv.appendChild(plusBtn);
+          dayBox.appendChild(counterDiv);
         }
         
         if (!isLocked) {
-          dayBox.onclick = (e) => { if (e.target !== checkbox && e.target.type !== 'range') { checkbox.checked = !checkbox.checked; checkbox.onchange(); } };
+          dayBox.onclick = (e) => { if (e.target !== checkbox && !e.target.classList.contains('counter-btn')) { checkbox.checked = !checkbox.checked; checkbox.onchange(); } };
         }
         
         dayBox.appendChild(label); calendar.appendChild(dayBox);
@@ -353,12 +397,16 @@
       const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
       let percent = checkboxes.length ? Math.round((checked / checkboxes.length) * 100) : 0;
       if (isStudy) {
-        const ranges = document.querySelectorAll(`#${cardId} input[type="range"]`);
-        let totalHours = 0; ranges.forEach(r => totalHours += parseInt(r.value || '0', 10));
-        percent = ranges.length ? Math.round((totalHours / (ranges.length * 8)) * 100) : 0;
+        let totalHours = 0;
+        const totalDays = checkboxes.length;
+        for(let d=1; d<=totalDays; d++) {
+          const hoursKey = `${keyPrefix}_${currentYear}_${currentMonth}_${d}_hours';`;
+          totalHours += parseInt(getItemValue(`${keyPrefix}_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10);
+        }
+        percent = totalDays ? Math.round((totalHours / (totalDays * 8)) * 100) : 0;
         document.getElementById(progressId).innerText = percent + '%';
         document.getElementById(progressId).style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
-        document.getElementById(statsId).innerText = `${totalHours}h / ${ranges.length * 8}h`;
+        document.getElementById(statsId).innerText = `${totalHours}h / ${totalDays * 8}h`;
       } else {
         document.getElementById(progressId).innerText = percent + '%';
         document.getElementById(progressId).style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
@@ -414,9 +462,9 @@
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
-    startDigitalClock(); setupHeader(); 
-    loadCloudData(); // Fetch cloud data on load
-    setInterval(loadCloudData, 10000); // Check for changes every 10 seconds automatically
+    startDigitalClock(); setupHeader(); initStopwatch();
+    loadCloudData();
+    setInterval(loadCloudData, 10000);
   </script>
 </body>
 </html>
