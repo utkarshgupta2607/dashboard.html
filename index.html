@@ -72,6 +72,16 @@
     .timer-btn { background: #ea580c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 12px; margin: 0 4px; }
     .timer-btn.reset { background: #94a3b8; }
 
+    /* Mock Analytics Styles */
+    .mock-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
+    .mock-form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .mock-input { padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; font-size: 14px; }
+    .mock-btn { background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .mock-btn:hover { background: #2563eb; }
+    .mock-table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; }
+    .mock-table th, .mock-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; }
+    .mock-table th { color: #64748b; }
+
     .syllabus-layout { display: grid; grid-template-columns: 280px 1fr; gap: 30px; }
     .syllabus-side-card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); border: 1px solid #f1f5f9; text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
     .circle-progress { width: 110px; height: 110px; border-radius: 50%; background: conic-gradient(#38ef7d 0%, #f1f5f9 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 20px; color: var(--text-dark); margin: 15px 0; }
@@ -87,6 +97,7 @@
     .progress-container { margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; }
     .mini-circle { width: 35px; height: 35px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
     .stats-lbl { font-size: 12px; font-weight: 700; color: #64748b; }
+    .streak-display { font-size: 14px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 4px 12px; border-radius: 8px; display: inline-block; margin-top: 5px; border: 1px solid #ffedd5; }
 
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
@@ -99,6 +110,7 @@
       .cards-grid, .syllabus-layout { grid-template-columns: 1fr; gap: 20px; }
       .day { padding: 8px 2px; font-size: 11px; }
       .subj-check-grid { grid-template-columns: repeat(2, 1fr); }
+      .mock-form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -116,6 +128,8 @@
     <div class="sidebar-section-title">Daily Tracking</div>
     <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
     <div class="task" id="tab-study" onclick="switchView('study')">Study Architecture</div>
+    <div class="task" id="tab-mocks" onclick="switchView('mocks')">📈 Mock Analytics</div>
+    
     <div class="sidebar-section-title">Surya 2.0 Syllabus</div>
     <div class="task" id="tab-english" onclick="switchView('english')">English Grammar</div>
     <div class="task" id="tab-math" onclick="switchView('math')">Advanced Maths</div>
@@ -128,7 +142,7 @@
       <div class="welcome-section">
         <div class="digital-clock" id="liveClock">00:00:00 AM</div>
         <h1 class="welcome-greet" id="greetingText">Hello, Utkarsh!</h1>
-        <p class="daily-quote" id="quoteText">"Your competition is preparing while you rest. Stay active."</p>
+        <div id="streakText" class="streak-display">🔥 Study Streak: 0 Days</div>
       </div>
       <div class="calendar-controls" id="calControls">
         <button onclick="prevMonth()">◀</button>
@@ -180,6 +194,28 @@
           <div class="progress-container">
             <div class="mini-circle" id="studyProgress">0%</div>
             <div class="stats-lbl" id="studyStats">0h / 0h</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-grid" id="view-mocks" style="display:none;">
+        <div class="card" style="grid-column: 1 / -1;">
+          <h3>CGL Mock Test Tracker</h3>
+          <div class="mock-form">
+            <div class="mock-form-row">
+              <input type="text" id="mockName" class="mock-input" placeholder="Mock Name (e.g., Live Mock 05)">
+              <input type="number" id="mockScore" class="mock-input" placeholder="Total Score (Out of 200)">
+              <input type="text" id="mockPercentile" class="mock-input" placeholder="Percentile (e.g., 94.5%)">
+            </div>
+            <button class="mock-btn" onclick="addNewMockRecord()">Add Mock Score Record</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="mock-table">
+              <thead>
+                <tr><th>Date</th><th>Mock Name</th><th>Marks obtained</th><th>Percentile</th><th>Action</th></tr>
+              </thead>
+              <tbody id="mockTableBody"></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -263,13 +299,15 @@
       document.getElementById(`tab-${viewKey}`).classList.add('active');
       document.getElementById('view-self').style.display = (viewKey === 'self') ? 'grid' : 'none';
       document.getElementById('view-study').style.display = (viewKey === 'study') ? 'grid' : 'none';
-      document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study') ? 'grid' : 'none';
+      document.getElementById('view-mocks').style.display = (viewKey === 'mocks') ? 'grid' : 'none';
+      document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study' && viewKey !== 'mocks') ? 'grid' : 'none';
       document.getElementById('calControls').style.display = (viewKey === 'self' || viewKey === 'study') ? 'flex' : 'none';
       refreshUI();
     }
 
     function refreshUI() {
       if (currentActiveTab === 'self' || currentActiveTab === 'study') { reloadCalendars(); } 
+      else if (currentActiveTab === 'mocks') { renderMockTable(); }
       else { renderSyllabusSheet(currentActiveTab); }
     }
 
@@ -303,6 +341,7 @@
       const storageKey = `subj_${sub}_${currentYear}_${currentMonth}_${todayDay}`;
       const chk = document.getElementById(`chk-subj-${sub}`);
       saveItemValue(storageKey, chk.checked);
+      calculateStreak(); // Re-calculate streak when input updates
     }
 
     function generateCalendar(cardId, progressId, statsId, keyPrefix, isStudy = false) {
@@ -328,6 +367,7 @@
             saveItemValue(storageKey, checkbox.checked);
             dayBox.classList.toggle('checked', checkbox.checked);
             updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+            calculateStreak();
           };
         }
         
@@ -345,6 +385,7 @@
                 cur--; saveItemValue(hoursKey, cur); hourValueSpan.innerText = `${cur}h`;
                 if(cur === 0 && checkbox.checked) { checkbox.checked = false; saveItemValue(storageKey, 'false'); dayBox.classList.remove('checked'); }
                 updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+                calculateStreak();
               }
             };
             plusBtn.onclick = (e) => {
@@ -353,6 +394,7 @@
                 cur++; saveItemValue(hoursKey, cur); hourValueSpan.innerText = `${cur}h`;
                 if(cur > 0 && !checkbox.checked) { checkbox.checked = true; saveItemValue(storageKey, 'true'); dayBox.classList.add('checked'); }
                 updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+                calculateStreak();
               }
             };
           }
@@ -380,6 +422,95 @@
         document.getElementById(progressId).style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
         document.getElementById(statsId).innerText = `${checked} / ${checkboxes.length}`;
       }
+    }
+
+    // NEW: Real-time Streak Counter Logic (Requires study hours > 0 to maintain)
+    function calculateStreak() {
+      let streak = 0;
+      const today = new Date();
+      let checkDate = new Date(today);
+
+      while (true) {
+        const d = checkDate.getDate();
+        const m = checkDate.getMonth() + 1;
+        const y = checkDate.getFullYear();
+        const studyKey = `study_${y}_${m}_${d}_hours`;
+        const hours = parseInt(getItemValue(studyKey) || '0', 10);
+
+        if (hours > 0) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1); // Check previous day
+        } else {
+          // If checking 'today' and it's 0, it shouldn't break the streak immediately if yesterday was active
+          if (streak === 0 && checkDate.toDateString() === today.toDateString()) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            continue;
+          }
+          break;
+        }
+      }
+      document.getElementById('streakText').innerText = `🔥 Study Streak: ${streak} Days`;
+    }
+
+    // NEW: Mock Analytics CRUD Actions
+    function getMockList() { return JSON.parse(getItemValue('cgl_mock_records') || '[]'); }
+    
+    function addNewMockRecord() {
+      const name = document.getElementById('mockName').value.trim();
+      const score = document.getElementById('mockScore').value.trim();
+      const percentile = document.getElementById('mockPercentile').value.trim();
+      
+      if(!name || !score) { alert("Please fill at least Mock Name and Score!"); return; }
+      
+      const records = getMockList();
+      const newRecord = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString('en-IN'),
+        name: name,
+        score: score,
+        percentile: percentile || 'N/A'
+      };
+      
+      records.unshift(newRecord); // Add to beginning
+      saveItemValue('cgl_mock_records', JSON.stringify(records));
+      
+      // Reset Inputs
+      document.getElementById('mockName').value = '';
+      document.getElementById('mockScore').value = '';
+      document.getElementById('mockPercentile').value = '';
+      
+      renderMockTable();
+    }
+
+    function deleteMockRecord(id) {
+      let records = getMockList();
+      records = records.filter(item => item.id !== id);
+      saveItemValue('cgl_mock_records', JSON.stringify(records));
+      renderMockTable();
+    }
+
+    function renderMockTable() {
+      const tbody = document.getElementById('mockTableBody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      const records = getMockList();
+      
+      if(records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records added yet. Complete your first test today!</td></tr>`;
+        return;
+      }
+
+      records.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.date}</td>
+          <td><strong>${item.name}</strong></td>
+          <td style="color:#2563eb; font-weight:700;">${item.score} / 200</td>
+          <td><span style="background:#ecfdf5; color:#059669; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td>
+          <td><button style="background:#fee2e2; color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
     function renderSyllabusSheet(subjectKey) {
@@ -432,9 +563,8 @@
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
     startDigitalClock(); setupHeader(); initStopwatch(); 
-    
-    // FIXED INITIALIZATION: Loads everything beautifully on the first load itself!
     reloadCalendars(); 
+    calculateStreak();
     refreshUI();
   </script>
 </body>
