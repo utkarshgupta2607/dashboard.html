@@ -5,124 +5,144 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mission CGL 2026 Dashboard - Utkarsh</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --sidebar-gradient: linear-gradient(180deg, #1e3a8a, #0f172a); 
-      --checked-gradient: linear-gradient(135deg, #11998e, #38ef7d); 
-      --day-bg-gradient: linear-gradient(180deg, #f9fafb, #f1f5f9);
-      --text-dark: #1e293b; --text-light: #ffffff;
+      --bg-dark: #090d16;
+      --card-bg: rgba(20, 28, 47, 0.6);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --sidebar-bg: #0e1626;
+      --neon-blue: #00f2fe;
+      --neon-green: #4facfe;
+      --checked-gradient: linear-gradient(135deg, #00f2fe, #4facfe);
+      --day-bg-gradient: linear-gradient(180deg, #151f32, #111a2a);
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
     }
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #f8fafc; width: 100%; overflow: hidden; }
     
-    .sidebar { width: 260px; background: var(--sidebar-gradient); color: var(--text-light); padding: 30px; box-shadow: 4px 0 25px rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: center; z-index: 10; }
-    .sidebar h2 { margin-top: 0; margin-bottom: 35px; font-size: 20px; font-weight: 800; letter-spacing: 1.5px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 15px; width: 100%; }
-    .sidebar-section-title { align-self: flex-start; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 15px 0 5px 5px; font-weight: 700; }
-    .task { width: 100%; background: rgba(255,255,255,0.05); padding: 12px 16px; margin: 5px 0; border-radius: 10px; text-align: left; font-weight: 600; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; transition: all 0.2s ease; }
-    .task:hover { background: rgba(255,255,255,0.12); transform: translateX(3px); }
-    .task.active { background: #ffffff; color: #1e3a8a; box-shadow: 0 8px 15px rgba(0,0,0,0.05); font-weight: 700; }
+    body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; background: var(--bg-dark); color: var(--text-main); width: 100%; overflow: hidden; }
     
-    .main { flex: 1; display: flex; flex-direction: column; background: #f8fafc; overflow: hidden; }
-    .topbar { background: #ffffff; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; gap: 15px; }
-    .welcome-section { display: flex; flex-direction: column; gap: 4px; }
-    .digital-clock { font-size: 14px; font-weight: 800; color: #3b82f6; letter-spacing: 0.5px; background: #eff6ff; padding: 4px 10px; border-radius: 8px; align-self: flex-start; display: inline-block; }
-    .welcome-greet { margin: 0; font-size: 22px; color: var(--text-dark); font-weight: 800; }
-    .daily-quote { margin: 0; font-size: 13px; color: #64748b; font-style: italic; }
+    .sidebar { width: 260px; background: var(--sidebar-bg); color: var(--text-main); padding: 30px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--card-border); }
+    .sidebar h2 { margin-top: 0; margin-bottom: 25px; font-size: 19px; font-weight: 900; letter-spacing: 2px; text-align: center; color: transparent; -webkit-background-clip: text; background-image: linear-gradient(90deg, #00f2fe, #4facfe); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; width: 100%; }
+    .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; margin: 15px 0 6px 5px; font-weight: 800; }
+    
+    .task { width: 100%; background: rgba(255,255,255,0.02); padding: 14px 18px; margin: 6px 0; border-radius: 12px; text-align: left; font-weight: 600; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .task:hover { background: rgba(255,255,255,0.05); color: var(--text-main); transform: translateX(4px); border-color: rgba(0, 242, 254, 0.2); }
+    .task.active { background: rgba(0, 242, 254, 0.08); color: var(--neon-blue); border-color: var(--neon-blue); font-weight: 700; box-shadow: 0 0 15px rgba(0, 242, 254, 0.15); }
+    
+    .main { flex: 1; display: flex; flex-direction: column; background: var(--bg-dark); overflow: hidden; position: relative; }
+    .topbar { background: var(--sidebar-bg); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); z-index: 5; }
+    .welcome-section { display: flex; flex-direction: column; gap: 6px; }
+    .digital-clock { font-size: 13px; font-weight: 800; color: var(--neon-blue); letter-spacing: 0.5px; background: rgba(0, 242, 254, 0.07); padding: 5px 12px; border-radius: 8px; align-self: flex-start; display: inline-block; border: 1px solid rgba(0, 242, 254, 0.15); }
+    .welcome-greet { margin: 0; font-size: 24px; color: var(--text-main); font-weight: 800; }
+    
     .calendar-controls { display: flex; align-items: center; gap: 15px; }
-    .calendar-controls h2 { margin: 0; font-size: 18px; color: var(--text-dark); font-weight: 700; min-width: 130px; text-align: center; }
-    .calendar-controls button { background: #ffffff; border: 1px solid #cbd5e1; color: #64748b; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-    .calendar-controls button:hover { background: #f1f5f9; }
+    .calendar-controls h2 { margin: 0; font-size: 17px; color: var(--text-main); font-weight: 700; min-width: 140px; text-align: center; }
+    .calendar-controls button { background: #151f32; border: 1px solid var(--card-border); color: #94a3b8; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 700; }
     
-    .cards-zone { flex: 1; padding: 30px 40px; overflow-y: auto; }
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; }
-    .card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); display: flex; flex-direction: column; border: 1px solid #f1f5f9; }
-    .card h3 { margin-top: 0; margin-bottom: 20px; font-size: 17px; color: var(--text-dark); font-weight: 700; display: flex; align-items: center; gap: 8px; }
-    .card h3::before { content: ''; width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: #3b82f6; }
+    .cards-zone { flex: 1; padding: 30px 40px; overflow-y: auto; z-index: 4; }
+    .cards-grid { display: flex; flex-direction: column; gap: 30px; }
     
-    /* Chart Container Styles */
-    .chart-box { width: 100%; height: 180px; margin-top: 15px; position: relative; }
+    .card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; border: 1px solid var(--card-border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); width: 100%; box-sizing: border-box; }
+    .card h3 { margin-top: 0; margin-bottom: 25px; font-size: 16px; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .card h3::before { content: ''; width: 8px; height: 8px; border-radius: 50%; display: inline-block; background-color: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue); }
+    
+    .calendar-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; width: 100%; }
+    .chart-box { width: 100%; height: 210px; margin-top: 10px; position: relative; }
 
-    .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; }
-    .subj-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--text-dark); cursor: pointer; }
-    .subj-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; appearance: auto; -webkit-appearance: auto; }
-    .subj-item.disabled { opacity: 0.6; cursor: not-allowed; }
+    .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 16px; border: 1px solid var(--card-border); }
+    .subj-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: #cbd5e1; cursor: pointer; padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,0.01); border: 1px solid transparent; }
+    .subj-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+    .subj-item.disabled { opacity: 0.3; cursor: not-allowed; }
 
-    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; }
-    .day { background: var(--day-bg-gradient); border: 1px solid #e2e8f0; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: all 0.2s; min-height: 55px; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 10px; }
+    .weekday-header { font-size: 11px; font-weight: 900; color: #475569; text-transform: uppercase; text-align: center; padding-bottom: 6px; letter-spacing: 1px; }
     
-    .day.checked { background: var(--checked-gradient); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(56, 239, 125, 0.3); }
-    .day.locked { cursor: not-allowed; opacity: 0.85; background: #e2e8f0; color: #94a3b8; border-style: dashed; }
-    .day.locked.checked { background: linear-gradient(135deg, #0d7a71, #27a858); color: rgba(255,255,255,0.8); }
-    .day.today { border: 2px solid #3b82f6; background: #fff; color: #3b82f6; font-weight: 700; }
-    .day.today::after { content: '●'; position: absolute; top: 2px; right: 5px; font-size: 7px; color: #3b82f6; }
+    .day { background: var(--day-bg-gradient); border: 1px solid var(--card-border); padding: 12px 4px; border-radius: 14px; text-align: center; font-size: 12px; color: #94a3b8; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-height: 60px; }
+    .day:hover:not(.locked) { border-color: rgba(0,242,254,0.3); background: #1a263d; }
     
-    .checkbox-container { display: inline-block; position: relative; width: 18px; height: 18px; margin-top: 4px; }
-    .calendar input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 6px; cursor: pointer; background: #fff; margin: 0; display: block; transition: all 0.15s; }
+    .day.checked { background: var(--checked-gradient); border-color: transparent; color: #0f172a; font-weight: 700; box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3); }
+    .day.locked { cursor: not-allowed; opacity: 0.4; background: #0f1622; color: #475569; border-style: dashed; }
+    .day.locked.checked { background: linear-gradient(135deg, #1c3d47, #1b422e); color: rgba(255,255,255,0.4); opacity: 0.7; }
+    
+    .day.today { border: 2px solid var(--neon-blue); background: rgba(0, 242, 254, 0.02); color: var(--neon-blue); font-weight: 800; box-shadow: 0 0 15px rgba(0, 242, 254, 0.1); }
+    .day.today::after { content: '●'; position: absolute; top: 4px; right: 8px; font-size: 6px; color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
+    
+    .checkbox-container { display: inline-block; position: relative; width: 18px; height: 18px; margin-top: 6px; }
+    .calendar input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #334155; border-radius: 6px; cursor: pointer; background: rgba(0,0,0,0.3); margin: 0; display: block; transition: all 0.2s; }
     .day.checked input[type="checkbox"] { background: #fff; border-color: #fff; }
     
-    .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #11998e; font-size: 12px; font-weight: 900; transition: transform 0.15s ease; pointer-events: none; }
+    .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #0e1626; font-size: 12px; font-weight: 900; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
     .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
-    .day.locked .checkbox-container::after { color: #0d7a71; }
-    .day.locked input[type="checkbox"] { cursor: not-allowed; background: #cbd5e1; border-color: #cbd5e1; }
+    .day.locked .checkbox-container::after { color: #475569; }
+    .day.locked input[type="checkbox"] { cursor: not-allowed; background: #1e293b; border-color: #1e293b; }
 
-    .counter-container { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; background: rgba(0,0,0,0.03); padding: 2px 4px; border-radius: 6px; width: 90%; box-sizing: border-box; }
-    .day.checked .counter-container { background: rgba(255,255,255,0.15); }
-    .counter-btn { background: #475569; color: white; border: none; font-size: 11px; font-weight: 900; width: 16px; height: 16px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; }
-    .day.checked .counter-btn { background: white; color: #11998e; }
-    .counter-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .counter-value { font-size: 11px; font-weight: 700; min-width: 18px; text-align: center; }
+    .counter-container { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 8px; width: 90%; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.02); }
+    .day.checked .counter-container { background: rgba(255,255,255,0.15); border-color: transparent; }
+    .counter-btn { background: #334155; color: white; border: none; font-size: 11px; font-weight: 900; width: 18px; height: 18px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .day.checked .counter-btn { background: #fff; color: #0e1626; }
+    .counter-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+    .counter-value { font-size: 11px; font-weight: 800; min-width: 20px; text-align: center; }
     
-    .timer-container { background: #fff7ed; border: 1px solid #ffedd5; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
-    .timer-display { font-size: 26px; font-weight: 800; color: #ea580c; font-family: monospace; margin-bottom: 10px; }
-    .timer-btn { background: #ea580c; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 12px; margin: 0 4px; }
-    .timer-btn.reset { background: #94a3b8; }
+    .timer-container { background: linear-gradient(135deg, #1e1b4b, #111827); border: 1px solid rgba(99, 102, 241, 0.2); padding: 18px; border-radius: 20px; text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; }
+    .timer-mode-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
+    .mode-lbl { font-size: 10px; text-transform: uppercase; font-weight: 800; padding: 2px 6px; border-radius: 4px; cursor: pointer; background: rgba(255,255,255,0.05); color: #64748b; }
+    .mode-lbl.active { background: rgba(0, 242, 254, 0.15); color: var(--neon-blue); border: 1px solid rgba(0, 242, 254, 0.3); }
+    
+    .timer-display { font-size: 28px; font-weight: 900; color: #ff5e62; font-family: 'Courier New', Courier, monospace; margin-bottom: 12px; text-shadow: 0 0 10px rgba(255, 94, 98, 0.2); }
+    .timer-btn { background: linear-gradient(135deg, #ff9966, #ff5e62); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px; margin: 0 5px; }
+    .timer-btn.reset { background: #475569; }
 
-    .mock-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
-    .mock-form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .mock-input { padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; font-size: 14px; }
-    .mock-btn { background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-    .mock-btn:hover { background: #2563eb; }
+    .mock-form { display: flex; flex-direction: column; gap: 14px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 18px; border-radius: 16px; border: 1px solid var(--card-border); }
+    .mock-form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .mock-input { padding: 10px 14px; border-radius: 10px; border: 1px solid #334155; background: #0e1626; color: white; font-weight: 600; font-size: 13px; }
+    .mock-btn { background: var(--checked-gradient); color: #0f172a; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
     .mock-table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; }
-    .mock-table th, .mock-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; }
-    .mock-table th { color: #64748b; }
+    .mock-table th, .mock-table td { padding: 12px; border-bottom: 1px solid var(--card-border); font-size: 13px; font-weight: 600; }
+    .mock-table th { color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
 
     .syllabus-layout { display: grid; grid-template-columns: 280px 1fr; gap: 30px; }
-    .syllabus-side-card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); border: 1px solid #f1f5f9; text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
-    .circle-progress { width: 110px; height: 110px; border-radius: 50%; background: conic-gradient(#38ef7d 0%, #f1f5f9 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 20px; color: var(--text-dark); margin: 15px 0; }
-    .syllabus-table-card { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03); border: 1px solid #f1f5f9; overflow-x: auto; }
-    .syllabus-table { width: 100%; border-collapse: collapse; min-width: 400px; }
-    .syllabus-table th { padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 13px; text-align: left; }
-    .syllabus-table td { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; color: var(--text-dark); font-size: 14px; font-weight: 600; }
-    .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 700; cursor: pointer; width: 100%; max-width: 150px; }
-    .status-select[data-status="not_started"] { background: #f1f5f9; color: #64748b; }
-    .status-select[data-status="in_progress"] { background: #eff6ff; color: #2563eb; }
-    .status-select[data-status="revision"] { background: #fffbeb; color: #d97706; }
-    .status-select[data-status="completed"] { background: #ecfdf5; color: #059669; }
-    .progress-container { margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .mini-circle { width: 35px; height: 35px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
-    .stats-lbl { font-size: 12px; font-weight: 700; color: #64748b; }
-    .streak-display { font-size: 14px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 4px 12px; border-radius: 8px; display: inline-block; margin-top: 5px; border: 1px solid #ffedd5; }
+    .syllabus-side-card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--card-border); backdrop-filter: blur(12px); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
+    .circle-progress { width: 110px; height: 110px; border-radius: 50%; background: conic-gradient(#4facfe 0%, #151f32 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 20px; color: var(--text-main); margin: 15px 0; }
+    .syllabus-table-card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--card-border); overflow-x: auto; }
+    .syllabus-table th { padding: 12px; border-bottom: 2px solid var(--card-border); color: var(--text-muted); font-size: 11px; text-transform: uppercase; text-align: left; }
+    .syllabus-table td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--text-main); font-size: 14px; font-weight: 600; }
+    
+    .status-select { padding: 8px 12px; border-radius: 10px; border: 1px solid #334155; font-weight: 700; cursor: pointer; width: 100%; max-width: 160px; color: white; }
+    .status-select[data-status="not_started"] { background-color: #1e293b; color: #94a3b8; }
+    .status-select[data-status="in_progress"] { background-color: rgba(14, 116, 144, 0.4); color: #22d3ee; border-color: #0e7490; }
+    .status-select[data-status="revision"] { background-color: rgba(180, 83, 9, 0.4); color: #fbbf24; border-color: #b45309; }
+    .status-select[data-status="completed"] { background-color: rgba(4, 120, 87, 0.4); color: #34d399; border-color: #047857; }
+    
+    .progress-container { margin-top: 15px; border-top: 1px solid var(--card-border); padding-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .mini-circle { width: 38px; height: 38px; border-radius: 50%; background: #151f32; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid var(--card-border); }
+    .stats-lbl { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+    .streak-display { font-size: 13px; font-weight: 800; color: #ff9966; background: rgba(255, 153, 102, 0.08); padding: 5px 14px; border-radius: 8px; display: inline-block; margin-top: 5px; border: 1px solid rgba(255, 153, 102, 0.2); }
 
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
       .sidebar { width: 100%; padding: 15px; }
-      .sidebar h2 { margin-bottom: 15px; padding-bottom: 8px; font-size: 18px; }
-      .task { padding: 10px 14px; font-size: 13px; }
+      .sidebar h2 { margin-bottom: 15px; padding-bottom: 8px; font-size: 17px; }
+      .task { padding: 12px 14px; font-size: 12px; }
       .topbar { padding: 15px 20px; flex-direction: column; text-align: center; }
       .calendar-controls { width: 100%; justify-content: center; margin-top: 10px; }
       .cards-zone { padding: 15px; }
       .cards-grid, .syllabus-layout { grid-template-columns: 1fr; gap: 20px; }
-      .day { padding: 8px 2px; font-size: 11px; }
+      .day { padding: 10px 2px; font-size: 11px; }
       .subj-check-grid { grid-template-columns: repeat(2, 1fr); }
-      .mock-form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
   <div class="sidebar">
-    <h2>MISSION CGL 2026</h2>
+    <h2>DASHBOARD 2026</h2>
     
     <div class="timer-container">
+      <div class="timer-mode-container">
+        <span id="mode-sw" class="mode-lbl active" onclick="switchTimerMode('sw')">Stopwatch</span>
+        <span id="mode-pomo" class="mode-lbl" onclick="switchTimerMode('pomo')">3H Pomo</span>
+      </div>
       <div class="timer-display" id="stopwatchDisplay">00:00:00</div>
       <button class="timer-btn" id="startStopBtn" onclick="toggleTimer()">Start</button>
       <button class="timer-btn reset" onclick="resetTimer()">Reset</button>
@@ -157,33 +177,40 @@
     <div class="cards-zone">
       <div class="cards-grid" id="view-self">
         <div class="card">
-          <h3>Meditation</h3>
-          <div class="calendar" id="meditationCalendar"></div>
-          <div class="progress-container">
-            <div class="mini-circle" id="meditationProgress">0%</div>
-            <div class="stats-lbl" id="meditationStats">0 / 0</div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Workout</h3>
-          <div class="calendar" id="workoutCalendar"></div>
-          <div class="progress-container">
-            <div class="mini-circle" id="workoutProgress">0%</div>
-            <div class="stats-lbl" id="workoutStats">0 / 0</div>
-          </div>
-        </div>
-        <div class="card" style="grid-column: 1 / -1;">
           <h3>Habits Completion Overview</h3>
           <div class="chart-box">
             <canvas id="habitChart"></canvas>
           </div>
         </div>
+        <div class="calendar-grid-row">
+          <div class="card">
+            <h3>Meditation</h3>
+            <div class="calendar" id="meditationCalendar"></div>
+            <div class="progress-container">
+              <div class="mini-circle" id="meditationProgress">0%</div>
+              <div class="stats-lbl" id="meditationStats">0 / 0</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Workout</h3>
+            <div class="calendar" id="workoutCalendar"></div>
+            <div class="progress-container">
+              <div class="mini-circle" id="workoutProgress">0%</div>
+              <div class="stats-lbl" id="workoutStats">0 / 0</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="cards-grid" id="view-study" style="display:none;">
-        <div class="card" style="grid-column: 1 / -1;">
+        <div class="card">
+          <h3>Study Hours Progression Curve</h3>
+          <div class="chart-box">
+            <canvas id="studyCurveChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
           <h3>Study Core Sessions</h3>
-          
           <div class="subj-check-grid" id="subjectsCheckGrid">
             <label class="subj-item" id="lbl-subj-math">
               <input type="checkbox" id="chk-subj-math" onchange="saveSubjectToggle('math')"> 📐 Maths
@@ -198,24 +225,23 @@
               <input type="checkbox" id="chk-subj-science" onchange="saveSubjectToggle('science')"> 🔬 Science
             </label>
           </div>
-
           <div class="calendar" id="studyCalendar"></div>
           <div class="progress-container">
             <div class="mini-circle" id="studyProgress">0%</div>
             <div class="stats-lbl" id="studyStats">0h / 0h</div>
           </div>
         </div>
-        <div class="card" style="grid-column: 1 / -1;">
-          <h3>Study Hours Progression Curve</h3>
-          <div class="chart-box">
-            <canvas id="studyCurveChart"></canvas>
-          </div>
-        </div>
       </div>
 
       <div class="cards-grid" id="view-mocks" style="display:none;">
-        <div class="card" style="grid-column: 1 / -1;">
-          <h3>CGL Mock Test Tracker</h3>
+        <div class="card">
+          <h3>CGL Mock Test Progress Graph</h3>
+          <div class="chart-box" style="height: 220px;">
+            <canvas id="mockAnalyticsChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Mock Records Log</h3>
           <div class="mock-form">
             <div class="mock-form-row">
               <input type="text" id="mockName" class="mock-input" placeholder="Mock Name (e.g., Live Mock 05)">
@@ -223,9 +249,6 @@
               <input type="text" id="mockPercentile" class="mock-input" placeholder="Percentile (e.g., 94.5%)">
             </div>
             <button class="mock-btn" onclick="addNewMockRecord()">Add Mock Score Record</button>
-          </div>
-          <div class="chart-box" style="height: 220px; margin-bottom: 25px;">
-            <canvas id="mockAnalyticsChart"></canvas>
           </div>
           <div style="overflow-x:auto;">
             <table class="mock-table">
@@ -257,16 +280,19 @@
   </div>
 
   <script>
+    // 🔑 LIVE CENTRAL DATABASE KEYED CONNECTORS (DEDICATED POSTGRES CLOUD)
+    const SUPABASE_URL = "https://wzxtpbyzoxivunwzbcsh.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6eHRwYnl6b3hpdnVud3piY3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY4ODk2MDAsImV4cCI6MjAzMjQ2NTYwMH0.7x9R9X_z88-X9wV9yB5Vl96uqW1eA9S7iOnv9m3RByI0Hduo";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let currentMonth = new Date().getMonth() + 1; 
     let currentYear = new Date().getFullYear(); 
     let currentActiveTab = 'self';
     
     let isTimerRunning = false; let startTime = 0; let elapsedTimeBefore = 0; let clockInterval = null;
+    let timerMode = 'sw'; const POMO_TOTAL_SECONDS = 3 * 60 * 60;
     
-    // Global Chart Instance Holders
-    let habitChartInstance = null;
-    let studyChartInstance = null;
-    let mockChartInstance = null;
+    let habitChartInstance = null; let studyChartInstance = null; let mockChartInstance = null;
 
     const syllabusData = {
       english: ["Parts of Speech", "Phrases", "Clauses", "Noun", "Subject Verb Agreement", "Pronoun", "Adjective", "Determiners", "Articles", "Verb", "Modals", "Tenses", "Conditional", "Mood", "Gerund", "Participle", "Infinitive", "Adverb", "Conjunction", "Preposition", "Phrasal Verbs", "Question Tag", "Voice", "Narration", "Parajumbles", "Cloze Test", "Reading Comprehension", "Fill In The Blanks"],
@@ -276,68 +302,104 @@
     };
 
     function getItemValue(key) { return localStorage.getItem(key) || null; }
-    function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
+
+    // ⚡ FIXED: SAVES LOCALLY INSTANTLY AND ROCKETS TO CLOUD DATABASE
+    async function saveItemValue(key, value) { 
+      localStorage.setItem(key, value.toString());
+      try {
+        await supabase.from('utkarsh_cgl_tracker').upsert({ key: key, value: value.toString() });
+      } catch(e) {}
+    }
+
+    // ⚡ FIXED: DOWNLOADS RAW CLOUD TRUTH ON PAGE OPEN (CROSS-DEVICE GUARANTEED)
+    async function syncDataFromDatabase() {
+      try {
+        const { data, error } = await supabase.from('utkarsh_cgl_tracker').select('*');
+        if (data && !error) {
+          data.forEach(row => {
+            localStorage.setItem(row.key, row.value);
+          });
+          reloadCalendars();
+          calculateStreak();
+          refreshUI();
+        }
+      } catch(e) {}
+    }
 
     function startDigitalClock() { setInterval(() => { const now = new Date(); let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0'); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; document.getElementById('liveClock').innerText = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`; }, 1000); }
     function setupHeader() { const now = new Date(); const hrs = now.getHours(); let greet = "Good Morning"; if (hrs >= 12 && hrs < 17) greet = "Good Afternoon"; else if (hrs >= 17 && hrs < 22) greet = "Good Evening"; else if (hrs >= 22 || hrs < 5) greet = "Hello"; document.getElementById('greetingText').innerText = `${greet}, Utkarsh!`; }
 
     function initStopwatch() {
+      timerMode = localStorage.getItem('tm_mode') || 'sw';
+      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
+      document.getElementById(`mode-${timerMode}`).classList.add('active');
+
       isTimerRunning = localStorage.getItem('sw_running') === 'true';
       elapsedTimeBefore = parseInt(localStorage.getItem('sw_elapsed') || '0', 10);
       startTime = parseInt(localStorage.getItem('sw_start_time') || '0', 10);
+      
       const btn = document.getElementById("startStopBtn");
       if (isTimerRunning && startTime > 0) {
-        btn.innerText = "Pause"; btn.style.background = "#94a3b8";
+        btn.innerText = "Pause"; btn.style.background = "#475569";
         startClockInterval();
-      } else { updateTimerDisplay(elapsedTimeBefore); }
+      } else {
+        updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore));
+      }
+    }
+
+    function switchTimerMode(mode) {
+      if(isTimerRunning) { alert("Please pause the current session first!"); return; }
+      timerMode = mode; saveItemValue('tm_mode', mode);
+      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
+      document.getElementById(`mode-${mode}`).classList.add('active');
+      elapsedTimeBefore = 0; startTime = 0; localStorage.setItem('sw_elapsed', '0');
+      updateTimerDisplay(mode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
     }
 
     function toggleTimer() {
-      const btn = document.getElementById("startStopBtn");
       if (isTimerRunning) {
         let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
         isTimerRunning = false; elapsedTimeBefore = currentElapsed;
-        localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
-        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "#ea580c";
+        saveItemValue('sw_running', 'false'); saveItemValue('sw_elapsed', elapsedTimeBefore);
+        clearInterval(clockInterval); document.getElementById("startStopBtn").innerText = "Start";
       } else {
         isTimerRunning = true; startTime = Date.now();
-        localStorage.setItem('sw_running', 'true'); localStorage.setItem('sw_start_time', startTime.toString()); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
-        btn.innerText = "Pause"; btn.style.background = "#94a3b8"; startClockInterval();
+        saveItemValue('sw_running', 'true'); saveItemValue('sw_start_time', startTime); saveItemValue('sw_elapsed', elapsedTimeBefore);
+        startClockInterval(); document.getElementById("startStopBtn").innerText = "Pause";
       }
-      updateTimerDisplay(elapsedTimeBefore);
     }
 
     function resetTimer() {
       isTimerRunning = false; clearInterval(clockInterval); elapsedTimeBefore = 0; startTime = 0;
-      localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', '0'); localStorage.setItem('sw_start_time', '0');
-      const btn = document.getElementById("startStopBtn"); btn.innerText = "Start"; btn.style.background = "#ea580c"; updateTimerDisplay(0);
+      saveItemValue('sw_running', 'false'); saveItemValue('sw_elapsed', '0'); saveItemValue('sw_start_time', '0');
+      updateTimerDisplay(timerMode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
     }
 
-    function startClockInterval() { clearInterval(clockInterval); clockInterval = setInterval(() => { let liveElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore; updateTimerDisplay(liveElapsed); }, 500); }
+    function startClockInterval() { clearInterval(clockInterval); clockInterval = setInterval(() => { let liveElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore; if (timerMode === 'pomo') { let remaining = POMO_TOTAL_SECONDS - liveElapsed; if (remaining <= 0) { clearInterval(clockInterval); resetTimer(); fireCyberAlarm(); return; } updateTimerDisplay(remaining); } else { updateTimerDisplay(liveElapsed); } }, 500); }
     function updateTimerDisplay(totalSecs) { const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0'); const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0'); const secs = String(totalSecs % 60).padStart(2, '0'); document.getElementById("stopwatchDisplay").innerText = `${hrs}:${mins}:${secs}`; }
+
+    function fireCyberAlarm() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      for(let i=0; i<3; i++) { setTimeout(() => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.setValueAtTime(0.2, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3); }, i*500); }
+      alert("🏆 Session Over, Utkarsh Bhai!");
+    }
 
     function switchView(viewKey) {
       currentActiveTab = viewKey;
       document.querySelectorAll('.task').forEach(t => t.classList.remove('active'));
       document.getElementById(`tab-${viewKey}`).classList.add('active');
-      document.getElementById('view-self').style.display = (viewKey === 'self') ? 'grid' : 'none';
-      document.getElementById('view-study').style.display = (viewKey === 'study') ? 'grid' : 'none';
-      document.getElementById('view-mocks').style.display = (viewKey === 'mocks') ? 'grid' : 'none';
+      document.getElementById('view-self').style.display = (viewKey === 'self') ? 'flex' : 'none';
+      document.getElementById('view-study').style.display = (viewKey === 'study') ? 'flex' : 'none';
+      document.getElementById('view-mocks').style.display = (viewKey === 'mocks') ? 'flex' : 'none';
       document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study' && viewKey !== 'mocks') ? 'grid' : 'none';
       document.getElementById('calControls').style.display = (viewKey === 'self' || viewKey === 'study') ? 'flex' : 'none';
       refreshUI();
     }
 
     function refreshUI() {
-      if (currentActiveTab === 'self' || currentActiveTab === 'study') { 
-        reloadCalendars(); 
-      } 
-      else if (currentActiveTab === 'mocks') { 
-        renderMockTable(); 
-      }
-      else { 
-        renderSyllabusSheet(currentActiveTab); 
-      }
+      if (currentActiveTab === 'self' || currentActiveTab === 'study') { reloadCalendars(); } 
+      else if (currentActiveTab === 'mocks') { renderMockTable(); }
+      else { renderSyllabusSheet(currentActiveTab); }
     }
 
     function isPastDate(year, month, day) {
@@ -349,19 +411,12 @@
     function renderSubjectCheckboxes() {
       const subs = ['math', 'english', 'reasoning', 'science'];
       const todayDay = new Date().getDate();
-      const todayMonth = new Date().getMonth() + 1;
-      const todayYear = new Date().getFullYear();
-      const isViewingToday = (currentYear === todayYear && currentMonth === todayMonth);
-
       subs.forEach(sub => {
         const chk = document.getElementById(`chk-subj-${sub}`);
         const lbl = document.getElementById(`lbl-subj-${sub}`);
         if (!chk) return;
         const storageKey = `subj_${sub}_${currentYear}_${currentMonth}_${todayDay}`; 
-        
         chk.checked = getItemValue(storageKey) === 'true';
-        if (!isViewingToday) { chk.disabled = true; lbl.classList.add('disabled'); } 
-        else { chk.disabled = false; lbl.classList.remove('disabled'); }
       });
     }
 
@@ -370,12 +425,17 @@
       const storageKey = `subj_${sub}_${currentYear}_${currentMonth}_${todayDay}`;
       const chk = document.getElementById(`chk-subj-${sub}`);
       saveItemValue(storageKey, chk.checked);
-      calculateStreak();
     }
 
     function generateCalendar(cardId, progressId, statsId, keyPrefix, isStudy = false) {
       const calendar = document.getElementById(cardId); if (!calendar) return; calendar.innerHTML = '';
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+      
+      const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+      weekdays.forEach(wd => { const headerLabel = document.createElement('div'); headerLabel.className = 'weekday-header'; headerLabel.innerText = wd; calendar.appendChild(headerLabel); });
+
+      const firstDayOffset = new Date(currentYear, currentMonth - 1, 1).getDay();
+      for (let p = 0; p < firstDayOffset; p++) { const emptyCell = document.createElement('div'); calendar.appendChild(emptyCell); }
       
       for (let day = 1; day <= daysInMonth; day++) {
         const dayBox = document.createElement('div'); dayBox.className = 'day'; dayBox.innerHTML = `${day}`;
@@ -396,8 +456,7 @@
             saveItemValue(storageKey, checkbox.checked);
             dayBox.classList.toggle('checked', checkbox.checked);
             updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
-            calculateStreak();
-            triggerChartUpdate(); // Live update charts on check toggle
+            calculateStreak(); triggerChartUpdate();
           };
         }
         
@@ -414,9 +473,7 @@
               if (cur > 0) {
                 cur--; saveItemValue(hoursKey, cur); hourValueSpan.innerText = `${cur}h`;
                 if(cur === 0 && checkbox.checked) { checkbox.checked = false; saveItemValue(storageKey, 'false'); dayBox.classList.remove('checked'); }
-                updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
-                calculateStreak();
-                triggerChartUpdate();
+                updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); calculateStreak(); triggerChartUpdate();
               }
             };
             plusBtn.onclick = (e) => {
@@ -424,9 +481,7 @@
               if (cur < 8) {
                 cur++; saveItemValue(hoursKey, cur); hourValueSpan.innerText = `${cur}h`;
                 if(cur > 0 && !checkbox.checked) { checkbox.checked = true; saveItemValue(storageKey, 'true'); dayBox.classList.add('checked'); }
-                updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
-                calculateStreak();
-                triggerChartUpdate();
+                updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); calculateStreak(); triggerChartUpdate();
               }
             };
           }
@@ -447,11 +502,11 @@
         for(let d=1; d<=totalDays; d++) { totalHours += parseInt(getItemValue(`${keyPrefix}_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10); }
         percent = totalDays ? Math.round((totalHours / (totalDays * 8)) * 100) : 0;
         document.getElementById(progressId).innerText = percent + '%';
-        document.getElementById(progressId).style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
+        document.getElementById(progressId).style.background = `conic-gradient(#00f2fe ${percent}%, #151f32 ${percent}%)`;
         document.getElementById(statsId).innerText = `${totalHours}h / ${totalDays * 8}h`;
       } else {
         document.getElementById(progressId).innerText = percent + '%';
-        document.getElementById(progressId).style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
+        document.getElementById(progressId).style.background = `conic-gradient(#00f2fe ${percent}%, #151f32 ${percent}%)`;
         document.getElementById(statsId).innerText = `${checked} / ${checkboxes.length}`;
       }
     }
@@ -475,44 +530,34 @@
       const name = document.getElementById('mockName').value.trim();
       const score = document.getElementById('mockScore').value.trim();
       const percentile = document.getElementById('mockPercentile').value.trim();
-      if(!name || !score) { alert("Please fill at least Mock Name and Score!"); return; }
-      
+      if(!name || !score) return;
       const records = getMockList();
       const newRecord = { id: Date.now(), date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'}), name: name, score: parseInt(score, 10), percentile: percentile || 'N/A' };
-      records.unshift(newRecord);
-      saveItemValue('cgl_mock_records', JSON.stringify(records));
-      
+      records.unshift(newRecord); saveItemValue('cgl_mock_records', JSON.stringify(records));
       document.getElementById('mockName').value = ''; document.getElementById('mockScore').value = ''; document.getElementById('mockPercentile').value = '';
       renderMockTable();
     }
 
     function deleteMockRecord(id) {
       let records = getMockList(); records = records.filter(item => item.id !== id);
-      saveItemValue('cgl_mock_records', JSON.stringify(records));
-      renderMockTable();
+      saveItemValue('cgl_mock_records', JSON.stringify(records)); renderMockTable();
     }
 
     function renderMockTable() {
       const tbody = document.getElementById('mockTableBody'); if(!tbody) return; tbody.innerHTML = '';
       const records = getMockList();
-      
       if(records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records added yet. Complete your first test today!</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records added yet.</td></tr>`;
         updateMockChart([]); return;
       }
       records.forEach(item => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${item.date}</td><td><strong>${item.name}</strong></td>
-          <td style="color:#2563eb; font-weight:700;">${item.score} / 200</td>
-          <td><span style="background:#ecfdf5; color:#059669; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td>
-          <td><button style="background:#fee2e2; color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
+        tr.innerHTML = `<td>${item.date}</td><td><strong>${item.name}</strong></td><td style="color:var(--neon-blue); font-weight:700;">${item.score} / 200</td><td><span style="background:rgba(52,211,153,0.1); color:#34d399; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td><td><button style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
         tbody.appendChild(tr);
       });
       updateMockChart(records);
     }
 
-    // NEW PREMIUN GRAPHICS: CHART BUILDERS & UPDATE ENGINES
     function triggerChartUpdate() {
       if (currentActiveTab === 'self') buildHabitChart();
       if (currentActiveTab === 'study') buildStudyCurveChart();
@@ -525,147 +570,57 @@
         if (getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`) === 'true') medCount++;
         if (getItemValue(`workout_${currentYear}_${currentMonth}_${d}`) === 'true') workCount++;
       }
-
-      const ctx = document.getElementById('habitChart');
-      if (!ctx) return;
+      const ctx = document.getElementById('habitChart'); if (!ctx) return;
       if (habitChartInstance) habitChartInstance.destroy();
-
-      habitChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Meditation Sessions', 'Workout Sessions'],
-          datasets: [{
-            label: 'Days Completed',
-            data: [medCount, workCount],
-            backgroundColor: ['#3b82f6', '#10b981'],
-            borderRadius: 8,
-            barThickness: 40
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: daysInMonth, ticks: { stepSize: 5 } } } }
-      });
+      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#00f2fe', '#4facfe'], borderRadius: 10, barThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
     }
 
     function buildStudyCurveChart() {
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
       let labels = []; let data = [];
-      for (let d = 1; d <= daysInMonth; d++) {
-        labels.push(`Day ${d}`);
-        data.push(parseInt(getItemValue(`study_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10));
-      }
-
-      const ctx = document.getElementById('studyCurveChart');
-      if (!ctx) return;
+      for (let d = 1; d <= daysInMonth; d++) { labels.push(`${d}`); data.push(parseInt(getItemValue(`study_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10)); }
+      const ctx = document.getElementById('studyCurveChart'); if (!ctx) return;
       if (studyChartInstance) studyChartInstance.destroy();
-
-      studyChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Study Hours',
-            data: data,
-            borderColor: '#ea580c',
-            backgroundColor: 'rgba(234, 88, 12, 0.1)',
-            borderWidth: 3,
-            tension: 0.3,
-            fill: true,
-            pointBackgroundColor: '#ea580c'
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 8, ticks: { stepSize: 1 } } } }
-      });
+      studyChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: '#00f2fe', backgroundColor: 'rgba(0, 242, 254, 0.05)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#00f2fe', pointRadius: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 8, ticks: { stepSize: 2, color: '#64748b' } } } } });
     }
 
     function updateMockChart(records) {
-      const ctx = document.getElementById('mockAnalyticsChart');
-      if (!ctx) return;
+      const ctx = document.getElementById('mockAnalyticsChart'); if (!ctx) return;
       if (mockChartInstance) mockChartInstance.destroy();
-
-      // Reverse to show chronological order (oldest to newest) on chart
-      const chartRecords = [...records].reverse();
-      const labels = chartRecords.map(r => r.name);
-      const scores = chartRecords.map(r => r.score);
-
-      mockChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Score Obtained',
-            data: scores,
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.15)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.2,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointBackgroundColor: '#2563eb'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: { y: { min: 0, max: 200, title: { display: true, text: 'Marks (Out of 200)', font: { weight: 'bold' } } } }
-        }
-      });
+      const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.score);
+      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#ff5e62', backgroundColor: 'rgba(255, 94, 98, 0.05)', borderWidth: 3, fill: true, tension: 0.2, pointRadius: 5, pointBackgroundColor: '#ff5e62' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
     }
 
     function renderSyllabusSheet(subjectKey) {
       const titles = { english: "English", math: "Advanced Maths", science: "Science", reasoning: "Reasoning" };
       document.getElementById('syllabusSubjectTitle').innerText = titles[subjectKey];
       const tbody = document.getElementById('syllabusTableBody'); tbody.innerHTML = '';
-      
       syllabusData[subjectKey].forEach((chapterName, index) => {
-        const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`;
-        const savedStatus = getItemValue(storageKey) || 'not_started';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td>
-          <td>
-            <select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)">
-              <option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option>
-              <option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option>
-              <option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option>
-              <option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option>
-            </select>
-          </td>`;
+        const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`; const savedStatus = getItemValue(storageKey) || 'not_started'; const tr = document.createElement('tr');
+        tr.innerHTML = `<td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td><td><select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)"><option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option><option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option><option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option><option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option></select></td>`;
         tbody.appendChild(tr);
       });
       calculateSyllabusProgress(subjectKey);
     }
 
-    function saveSyllabusStatus(subjectKey, chNo, selectElement) {
-      saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value);
-      selectElement.setAttribute('data-status', selectElement.value);
-      calculateSyllabusProgress(subjectKey);
-    }
-
-    function calculateSyllabusProgress(subjectKey) {
-      let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; });
-      const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0;
-      document.getElementById('syllabusCircle').innerText = `${percent}%`;
-      document.getElementById('syllabusCircle').style.background = `conic-gradient(#38ef7d ${percent}%, #f1f5f9 ${percent}%)`;
-      document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`;
-    }
+    function saveSyllabusStatus(subjectKey, chNo, selectElement) { saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); selectElement.setAttribute('data-status', selectElement.value); calculateSyllabusProgress(subjectKey); }
+    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#4facfe ${percent}%, #151f32 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
 
     function reloadCalendars() {
       document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
       generateCalendar('meditationCalendar', 'meditationProgress', 'meditationStats', 'meditation', false);
       generateCalendar('workoutCalendar', 'workoutProgress', 'workoutStats', 'workout', false);
       generateCalendar('studyCalendar', 'studyProgress', 'studyStats', 'study', true);
-      renderSubjectCheckboxes();
-      triggerChartUpdate(); // Reload chart views instantly
+      renderSubjectCheckboxes(); triggerChartUpdate();
     }
 
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
-    startDigitalClock(); setupHeader(); initStopwatch(); 
-    reloadCalendars(); 
-    calculateStreak();
-    refreshUI();
+    startDigitalClock(); setupHeader(); initStopwatch();
+    
+    // ⚡ FIXED: DATA TRIGGER ENGINE ON OPEN
+    syncDataFromDatabase();
   </script>
 </body>
 </html>
