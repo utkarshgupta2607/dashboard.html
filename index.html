@@ -7,147 +7,161 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: rgba(20, 28, 47, 0.6);
-      --card-border: rgba(255, 255, 255, 0.05);
-      --sidebar-bg: #0e1626;
-      --neon-blue: #00f2fe;
-      --neon-green: #4facfe;
-      --checked-gradient: linear-gradient(135deg, #00f2fe, #4facfe);
-      --day-bg-gradient: linear-gradient(180deg, #151f32, #111a2a);
-      --text-main: #f1f5f9;
+      --bg-main: #f4f7f6;
+      --card-bg: #ffffff;
+      --sidebar-bg: #ffffff;
+      --text-main: #1e293b;
       --text-muted: #64748b;
+      --primary-bright: #10b981;
+      --secondary-bright: #3b82f6;
+      --accent-orange: #ea580c;
+      --border-light: #e2e8f0;
+      --checked-gradient: linear-gradient(135deg, #34d399, #10b981);
+      --day-bg: #f8fafc;
     }
     
-    body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; background: var(--bg-dark); color: var(--text-main); width: 100%; overflow: hidden; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; background: var(--bg-main); color: var(--text-main); width: 100%; overflow: hidden; }
     
-    /* Left Sidebar */
-    .sidebar { width: 260px; background: var(--sidebar-bg); color: var(--text-main); padding: 30px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--card-border); }
-    .sidebar h2 { margin-top: 0; margin-bottom: 25px; font-size: 19px; font-weight: 900; letter-spacing: 2px; text-align: center; color: transparent; -webkit-background-clip: text; background-image: linear-gradient(90deg, #00f2fe, #4facfe); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; width: 100%; }
-    .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; margin: 15px 0 6px 5px; font-weight: 800; }
+    /* Responsive Left Sidebar */
+    .sidebar { width: 260px; background: var(--sidebar-bg); color: var(--text-main); padding: 25px; box-shadow: 4px 0 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--border-light); }
+    .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: #0f172a; border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
+    .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 15px 0 6px 5px; font-weight: 800; }
     
-    .task { width: 100%; background: rgba(255,255,255,0.02); padding: 14px 18px; margin: 6px 0; border-radius: 12px; text-align: left; font-weight: 600; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .task:hover { background: rgba(255,255,255,0.05); color: var(--text-main); transform: translateX(4px); border-color: rgba(0, 242, 254, 0.2); }
-    .task.active { background: rgba(0, 242, 254, 0.08); color: var(--neon-blue); border-color: var(--neon-blue); font-weight: 700; box-shadow: 0 0 15px rgba(0, 242, 254, 0.15); }
+    .task { width: 100%; background: var(--bg-main); padding: 12px 16px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #475569; border: 1px solid transparent; transition: all 0.2s; }
+    .task:hover { background: #e2e8f0; color: #0f172a; }
+    .task.active { background: rgba(16, 185, 129, 0.1); color: #047857; border-color: rgba(16, 185, 129, 0.3); font-weight: 700; }
     
-    /* Main Content */
-    .main { flex: 1; display: flex; flex-direction: column; background: var(--bg-dark); overflow: hidden; position: relative; }
+    /* Main View Area */
+    .main { flex: 1; display: flex; flex-direction: column; background: var(--bg-main); overflow: hidden; }
     
-    .topbar { background: var(--sidebar-bg); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); z-index: 5; }
-    .welcome-section { display: flex; flex-direction: column; gap: 6px; }
-    .digital-clock { font-size: 13px; font-weight: 800; color: var(--neon-blue); letter-spacing: 0.5px; background: rgba(0, 242, 254, 0.07); padding: 5px 12px; border-radius: 8px; align-self: flex-start; display: inline-block; border: 1px solid rgba(0, 242, 254, 0.15); }
-    .welcome-greet { margin: 0; font-size: 24px; color: var(--text-main); font-weight: 800; }
+    .topbar { background: #ffffff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); z-index: 5; gap: 15px; flex-wrap: wrap; }
+    .welcome-section { display: flex; flex-direction: column; gap: 4px; }
+    .digital-clock { font-size: 12px; font-weight: 800; color: var(--secondary-bright); letter-spacing: 0.5px; background: rgba(59, 130, 246, 0.08); padding: 4px 10px; border-radius: 6px; align-self: flex-start; display: inline-block; border: 1px solid rgba(59, 130, 246, 0.15); }
+    .welcome-greet { margin: 0; font-size: 20px; color: #0f172a; font-weight: 800; }
     
-    /* Sync Cloud Buttons Container */
-    .sync-container { display: flex; gap: 10px; margin-left: auto; margin-right: 30px; }
-    .sync-btn { padding: 8px 14px; border-radius: 10px; border: 1px solid #1e293b; color: white; cursor: pointer; font-weight: 700; font-size: 12px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-    .sync-btn.push { background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #10b981; }
-    .sync-btn.push:hover { background: #10b981; color: #090d16; }
-    .sync-btn.fetch { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6; }
-    .sync-btn.fetch:hover { background: #3b82f6; color: #090d16; }
+    /* Backup/Fetch Controls */
+    .sync-container { display: flex; gap: 8px; }
+    .sync-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); cursor: pointer; font-weight: 700; font-size: 11px; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+    .sync-btn.push { background: rgba(16, 185, 129, 0.08); border-color: #10b981; color: #10b981; }
+    .sync-btn.push:hover { background: #10b981; color: white; }
+    .sync-btn.fetch { background: rgba(59, 130, 246, 0.08); border-color: #3b82f6; color: #3b82f6; }
+    .sync-btn.fetch:hover { background: #3b82f6; color: white; }
 
-    .calendar-controls { display: flex; align-items: center; gap: 15px; }
-    .calendar-controls h2 { margin: 0; font-size: 17px; color: var(--text-main); font-weight: 700; min-width: 140px; text-align: center; }
-    .calendar-controls button { background: #151f32; border: 1px solid var(--card-border); color: #94a3b8; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 700; }
+    .calendar-controls { display: flex; align-items: center; gap: 10px; }
+    .calendar-controls h2 { margin: 0; font-size: 15px; color: var(--text-main); font-weight: 700; min-width: 110px; text-align: center; }
+    .calendar-controls button { background: #ffffff; border: 1px solid var(--border-light); color: var(--text-muted); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+    .calendar-controls button:hover { background: var(--bg-main); color: var(--text-main); }
     
-    .cards-zone { flex: 1; padding: 30px 40px; overflow-y: auto; z-index: 4; }
-    .cards-grid { display: flex; flex-direction: column; gap: 30px; }
+    /* Content Zone */
+    .cards-zone { flex: 1; padding: 20px 30px; overflow-y: auto; }
+    .cards-grid { display: flex; flex-direction: column; gap: 25px; width: 100%; }
     
-    .card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; border: 1px solid var(--card-border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); width: 100%; box-sizing: border-box; }
-    .card h3 { margin-top: 0; margin-bottom: 25px; font-size: 16px; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 10px; }
-    .card h3::before { content: ''; width: 8px; height: 8px; border-radius: 50%; display: inline-block; background-color: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue); }
+    /* Bright Premium Cards */
+    .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; border: 1px solid var(--border-light); width: 100%; box-sizing: border-box; }
+    .card h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; background-color: var(--primary-bright); }
     
-    .calendar-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; width: 100%; }
-    .chart-box { width: 100%; height: 210px; margin-top: 10px; position: relative; }
+    .calendar-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%; }
+    .chart-box { width: 100%; height: 200px; margin-top: 5px; position: relative; }
 
-    .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 16px; border: 1px solid var(--card-border); }
-    .subj-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: #cbd5e1; cursor: pointer; padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,0.01); border: 1px solid transparent; }
-    .subj-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+    /* Subject Checklist Matrix */
+    .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; background: var(--bg-main); padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); }
+    .subj-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; padding: 6px; border-radius: 6px; }
+    .subj-item input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; }
     .subj-item.disabled { opacity: 0.3; cursor: not-allowed; }
 
-    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 10px; }
-    .weekday-header { font-size: 11px; font-weight: 900; color: #475569; text-transform: uppercase; text-align: center; padding-bottom: 6px; letter-spacing: 1px; }
+    /* Calendar Responsiveness */
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 6px; width: 100%; }
+    .weekday-header { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; text-align: center; padding-bottom: 4px; }
     
-    .day { background: var(--day-bg-gradient); border: 1px solid var(--card-border); padding: 12px 4px; border-radius: 14px; text-align: center; font-size: 12px; color: #94a3b8; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-height: 60px; }
-    .day:hover:not(.locked) { border-color: rgba(0,242,254,0.3); background: #1a263d; }
+    .day { background: var(--day-bg); border: 1px solid var(--border-light); padding: 10px 2px; border-radius: 10px; text-align: center; font-size: 12px; color: #475569; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 58px; transition: all 0.2s; }
+    .day:hover:not(.locked) { background: #edf2f7; border-color: #cbd5e1; }
     
-    .day.checked { background: var(--checked-gradient); border-color: transparent; color: #0f172a; font-weight: 700; box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3); }
-    .day.locked { cursor: not-allowed; opacity: 0.4; background: #0f1622; color: #475569; border-style: dashed; }
-    .day.locked.checked { background: linear-gradient(135deg, #1c3d47, #1b422e); color: rgba(255,255,255,0.4); opacity: 0.7; }
+    .day.checked { background: var(--checked-gradient); border-color: transparent; color: white; font-weight: 700; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
+    .day.locked { cursor: not-allowed; opacity: 0.4; background: #f1f5f9; color: #94a3b8; border-style: dashed; }
+    .day.locked.checked { background: #cbd5e1; color: #64748b; opacity: 0.6; }
     
-    .day.today { border: 2px solid var(--neon-blue); background: rgba(0, 242, 254, 0.02); color: var(--neon-blue); font-weight: 800; box-shadow: 0 0 15px rgba(0, 242, 254, 0.1); }
-    .day.today::after { content: '●'; position: absolute; top: 4px; right: 8px; font-size: 6px; color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
+    .day.today { border: 2px solid var(--secondary-bright); background: #ffffff; color: var(--secondary-bright); font-weight: 800; }
+    .day.today::after { content: '●'; position: absolute; top: 2px; right: 5px; font-size: 6px; color: var(--secondary-bright); }
     
-    .checkbox-container { display: inline-block; position: relative; width: 18px; height: 18px; margin-top: 6px; }
-    .calendar input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #334155; border-radius: 6px; cursor: pointer; background: rgba(0,0,0,0.3); margin: 0; display: block; transition: all 0.2s; }
+    .checkbox-container { display: inline-block; position: relative; width: 16px; height: 16px; margin-top: 4px; }
+    .calendar input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #cbd5e1; border-radius: 5px; cursor: pointer; background: #fff; margin: 0; display: block; }
     .day.checked input[type="checkbox"] { background: #fff; border-color: #fff; }
     
-    .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #0e1626; font-size: 12px; font-weight: 900; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
+    .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: var(--primary-bright); font-size: 11px; font-weight: 900; transition: transform 0.15s; pointer-events: none; }
     .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
-    .day.locked .checkbox-container::after { color: #475569; }
-    .day.locked input[type="checkbox"] { cursor: not-allowed; background: #1e293b; border-color: #1e293b; }
 
-    .counter-container { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 8px; width: 90%; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.02); }
-    .day.checked .counter-container { background: rgba(255,255,255,0.15); border-color: transparent; }
-    .counter-btn { background: #334155; color: white; border: none; font-size: 11px; font-weight: 900; width: 18px; height: 18px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .day.checked .counter-btn { background: #fff; color: #0e1626; }
+    /* Counter Engine */
+    .counter-container { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; background: rgba(0,0,0,0.03); padding: 2px 4px; border-radius: 6px; width: 95%; box-sizing: border-box; }
+    .day.checked .counter-container { background: rgba(255,255,255,0.2); }
+    .counter-btn { background: #64748b; color: white; border: none; font-size: 10px; font-weight: 900; width: 16px; height: 16px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .day.checked .counter-btn { background: #fff; color: var(--primary-bright); }
     .counter-btn:disabled { opacity: 0.2; cursor: not-allowed; }
-    .counter-value { font-size: 11px; font-weight: 800; min-width: 20px; text-align: center; }
+    .counter-value { font-size: 10px; font-weight: 800; min-width: 16px; text-align: center; }
     
-    .timer-container { background: linear-gradient(135deg, #1e1b4b, #111827); border: 1px solid rgba(99, 102, 241, 0.2); padding: 18px; border-radius: 20px; text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; }
-    .timer-mode-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
-    .mode-lbl { font-size: 10px; text-transform: uppercase; font-weight: 800; padding: 2px 6px; border-radius: 4px; cursor: pointer; background: rgba(255,255,255,0.05); color: #64748b; }
-    .mode-lbl.active { background: rgba(0, 242, 254, 0.15); color: var(--neon-blue); border: 1px solid rgba(0, 242, 254, 0.3); }
+    /* Stopwatch & Pomo Box */
+    .timer-container { background: #1e293b; color: white; padding: 15px; border-radius: 14px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .timer-mode-container { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
+    .mode-lbl { font-size: 9px; text-transform: uppercase; font-weight: 800; padding: 2px 6px; border-radius: 4px; cursor: pointer; background: rgba(255,255,255,0.05); color: #94a3b8; }
+    .mode-lbl.active { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
     
-    .timer-display { font-size: 28px; font-weight: 900; color: #ff5e62; font-family: 'Courier New', Courier, monospace; margin-bottom: 12px; text-shadow: 0 0 10px rgba(255, 94, 98, 0.2); }
-    .timer-btn { background: linear-gradient(135deg, #ff9966, #ff5e62); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px; margin: 0 5px; }
+    .timer-display { font-size: 24px; font-weight: 900; color: #f8fafc; font-family: monospace; margin-bottom: 10px; }
+    .timer-btn { background: linear-gradient(135deg, #34d399, #10b981); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 11px; margin: 0 3px; }
     .timer-btn.reset { background: #475569; }
 
-    .mock-form { display: flex; flex-direction: column; gap: 14px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 18px; border-radius: 16px; border: 1px solid var(--card-border); }
-    .mock-form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .mock-input { padding: 10px 14px; border-radius: 10px; border: 1px solid #334155; background: #0e1626; color: white; font-weight: 600; font-size: 13px; }
-    .mock-btn { background: var(--checked-gradient); color: #0f172a; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-    .mock-table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; }
-    .mock-table th, .mock-table td { padding: 12px; border-bottom: 1px solid var(--card-border); font-size: 13px; font-weight: 600; }
-    .mock-table th { color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
+    /* Mocks & Tables Form Layout */
+    .mock-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: var(--bg-main); padding: 12px; border-radius: 12px; border: 1px solid var(--border-light); }
+    .mock-form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .mock-input { padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: var(--text-main); font-weight: 600; font-size: 13px; }
+    .mock-btn { background: var(--checked-gradient); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .mock-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: left; }
+    .mock-table th, .mock-table td { padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 600; }
+    .mock-table th { color: var(--text-muted); text-transform: uppercase; font-size: 10px; }
 
-    .syllabus-layout { display: grid; grid-template-columns: 280px 1fr; gap: 30px; }
-    .syllabus-side-card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--card-border); backdrop-filter: blur(12px); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
-    .circle-progress { width: 110px; height: 110px; border-radius: 50%; background: conic-gradient(#4facfe 0%, #151f32 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 20px; color: var(--text-main); margin: 15px 0; }
-    .syllabus-table-card { background: var(--card-bg); border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--card-border); backdrop-filter: blur(12px); overflow-x: auto; }
-    .syllabus-table th { padding: 12px; border-bottom: 2px solid var(--card-border); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
-    .syllabus-table td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--text-main); font-size: 14px; font-weight: 600; }
+    /* Syllabus Layout Matrix */
+    .syllabus-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
+    .syllabus-side-card { background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--border-light); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
+    .circle-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(#10b981 0%, #f1f5f9 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; color: var(--text-main); margin: 12px 0; }
+    .syllabus-table-card { background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--border-light); overflow-x: auto; }
+    .syllabus-table th { padding: 10px; border-bottom: 2px solid var(--border-light); color: var(--text-muted); font-size: 10px; text-transform: uppercase; text-align: left; }
+    .syllabus-table td { padding: 12px 10px; border-bottom: 1px solid var(--bg-main); color: var(--text-main); font-size: 13px; font-weight: 600; }
     
-    .status-select { padding: 8px 12px; border-radius: 10px; border: 1px solid #334155; font-weight: 700; cursor: pointer; width: 100%; max-width: 160px; color: white; }
-    .status-select[data-status="not_started"] { background-color: #1e293b; color: #94a3b8; }
-    .status-select[data-status="in_progress"] { background-color: rgba(14, 116, 144, 0.4); color: #22d3ee; border-color: #0e7490; }
-    .status-select[data-status="revision"] { background-color: rgba(180, 83, 9, 0.4); color: #fbbf24; border-color: #b45309; }
-    .status-select[data-status="completed"] { background-color: rgba(4, 120, 87, 0.4); color: #34d399; border-color: #047857; }
+    .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 700; cursor: pointer; width: 100%; max-width: 150px; background: #fff; }
+    .status-select[data-status="not_started"] { background-color: #f1f5f9; color: #64748b; }
+    .status-select[data-status="in_progress"] { background-color: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+    .status-select[data-status="revision"] { background-color: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .status-select[data-status="completed"] { background-color: #ecfdf5; color: #059669; border-color: #a7f3d0; }
     
-    .progress-container { margin-top: 15px; border-top: 1px solid var(--card-border); padding-top: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .mini-circle { width: 38px; height: 38px; border-radius: 50%; background: #151f32; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid var(--card-border); }
-    .stats-lbl { font-size: 12px; font-weight: 700; color: var(--text-muted); }
-    .streak-display { font-size: 13px; font-weight: 800; color: #ff9966; background: rgba(255, 153, 102, 0.08); padding: 5px 14px; border-radius: 8px; display: inline-block; margin-top: 5px; border: 1px solid rgba(255, 153, 102, 0.2); }
+    .progress-container { margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .mini-circle { width: 34px; height: 34px; border-radius: 50%; background: var(--day-bg); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid var(--border-light); }
+    .stats-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+    .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(234, 88, 12, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; border: 1px solid rgba(234, 88, 12, 0.15); }
 
+    /* 📱 FULL MOBILE RESPONSIVE ENGINE CRITICAL OVERRIDES */
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
-      .sidebar { width: 100%; padding: 15px; }
-      .sidebar h2 { margin-bottom: 15px; padding-bottom: 8px; font-size: 17px; }
-      .task { padding: 12px 14px; font-size: 12px; }
-      .topbar { padding: 15px 20px; flex-direction: column; text-align: center; gap: 10px; }
-      .sync-container { margin: 10px 0; justify-content: center; width: 100%; }
-      .calendar-controls { width: 100%; justify-content: center; margin-top: 10px; }
-      .cards-zone { padding: 15px; }
-      .cards-grid, .syllabus-layout { grid-template-columns: 1fr; gap: 20px; }
-      .day { padding: 10px 2px; font-size: 11px; }
-      .subj-check-grid { grid-template-columns: repeat(2, 1fr); }
+      .sidebar { width: 100%; padding: 15px; border-right: none; border-bottom: 1px solid var(--border-light); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+      .sidebar h2 { margin-bottom: 10px; padding-bottom: 8px; font-size: 16px; }
+      .task { padding: 10px 14px; font-size: 12px; margin: 2px 0; }
+      .topbar { padding: 15px; flex-direction: column; text-align: center; gap: 12px; }
+      .sync-container { margin: 5px 0; justify-content: center; width: 100%; }
+      .calendar-controls { width: 100%; justify-content: center; }
+      .cards-zone { padding: 15px; overflow-y: visible; }
+      .cards-grid { gap: 20px; }
+      .calendar-grid-row { grid-template-columns: 1fr; gap: 20px; }
+      .day { padding: 8px 1px; font-size: 11px; min-height: 54px; }
+      .subj-check-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .mock-form-row { grid-template-columns: 1fr; gap: 8px; }
+      .syllabus-layout { grid-template-columns: 1fr; gap: 20px; }
+      .syllabus-side-card { position: static; width: 100%; }
     }
   </style>
 </head>
 <body>
 
   <div class="sidebar">
-    <h2>DASHBOARD 2026</h2>
+    <h2>MISSION CGL 2026</h2>
     
     <div class="timer-container">
       <div class="timer-mode-container">
@@ -261,9 +275,9 @@
           <h3>Mock Records Log</h3>
           <div class="mock-form">
             <div class="mock-form-row">
-              <input type="text" id="mockName" class="mock-input" placeholder="Mock Name (e.g., Live Mock 05)">
-              <input type="number" id="mockScore" class="mock-input" placeholder="Total Score (Out of 200)">
-              <input type="text" id="mockPercentile" class="mock-input" placeholder="Percentile (e.g., 94.5%)">
+              <input type="text" id="mockName" class="mock-input" placeholder="Mock Name">
+              <input type="number" id="mockScore" class="mock-input" placeholder="Score (Max 200)">
+              <input type="text" id="mockPercentile" class="mock-input" placeholder="Percentile">
             </div>
             <button class="mock-btn" onclick="addNewMockRecord()">Add Mock Score Record</button>
           </div>
@@ -297,7 +311,6 @@
   </div>
 
   <script>
-    // BIN-SERVER ADDRESSES FOR FLAWLESS TRANSFERS
     const BIN_ID = "65b53d09dc746540189b7cf3";
     const SECURE_KEY = "$2a$10$W1eA9S7iOnv9m3RByI0HduoEqK9p4YpAghuYfX1K9wV9yB5Vl96uq";
 
@@ -320,42 +333,35 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
-    // FIXED ONE-CLICK BACKUP SYSTEM (NO HANGING GUARANTEED)
     async function backupToCloud() {
       const btn = document.querySelector('.sync-btn.push');
       btn.innerText = "📤 Saving...";
       try {
         let dump = {};
         for(let i=0; i<localStorage.length; i++) {
-          let k = localStorage.key(i);
-          dump[k] = localStorage.getItem(k);
+          let k = localStorage.key(i); dump[k] = localStorage.getItem(k);
         }
         let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": SECURE_KEY },
-          body: JSON.stringify(dump)
+          method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": SECURE_KEY }, body: JSON.stringify(dump)
         });
-        if(res.ok) { btn.innerText = "✅ Saved to Cloud!"; setTimeout(() => btn.innerText = "📤 Backup to Cloud", 2500); }
+        if(res.ok) { btn.innerText = "✅ Saved!"; setTimeout(() => btn.innerText = "📤 Backup to Cloud", 2000); }
         else { throw new Error(); }
-      } catch(e) { alert("Sync Error! Please check internet connection."); btn.innerText = "📤 Backup to Cloud"; }
+      } catch(e) { alert("Sync Error!"); btn.innerText = "📤 Backup to Cloud"; }
     }
 
-    // FIXED ONE-CLICK FETCH SYSTEM (CROSS DEVICE COPIER)
     async function fetchFromCloud() {
       const btn = document.querySelector('.sync-btn.fetch');
       btn.innerText = "📥 Loading...";
       try {
-        let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, {
-          headers: { "X-Master-Key": SECURE_KEY }
-        });
+        let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, { headers: { "X-Master-Key": SECURE_KEY } });
         if(res.ok) {
           let incoming = await res.json();
           for(let k in incoming) { localStorage.setItem(k, incoming[k]); }
-          btn.innerText = "✅ Synced Perfectly!";
-          setTimeout(() => btn.innerText = "📥 Fetch from Cloud", 2500);
+          btn.innerText = "✅ Synced!";
+          setTimeout(() => btn.innerText = "📥 Fetch from Cloud", 2000);
           reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
         } else { throw new Error(); }
-      } catch(e) { alert("Sync Error! Cloud data is empty or connection failed."); btn.innerText = "📥 Fetch from Cloud"; }
+      } catch(e) { alert("Sync Failed!"); btn.innerText = "📥 Fetch from Cloud"; }
     }
 
     function startDigitalClock() { setInterval(() => { const now = new Date(); let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0'); const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12; document.getElementById('liveClock').innerText = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`; }, 1000); }
@@ -374,7 +380,7 @@
     }
 
     function switchTimerMode(mode) {
-      if(isTimerRunning) { alert("Please pause current active session first!"); return; }
+      if(isTimerRunning) { alert("Pause first!"); return; }
       timerMode = mode; localStorage.setItem('tm_mode', mode);
       document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
       document.getElementById(`mode-${mode}`).classList.add('active');
@@ -388,7 +394,7 @@
         let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
         isTimerRunning = false; elapsedTimeBefore = currentElapsed;
         localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
-        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #ff9966, #ff5e62)";
+        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #34d399, #10b981)";
         updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore));
       } else {
         isTimerRunning = true; startTime = Date.now();
@@ -400,7 +406,7 @@
     function resetTimer() {
       isTimerRunning = false; clearInterval(clockInterval); elapsedTimeBefore = 0; startTime = 0;
       localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', '0'); localStorage.setItem('sw_start_time', '0');
-      document.getElementById("startStopBtn").innerText = "Start"; document.getElementById("startStopBtn").style.background = "linear-gradient(135deg, #ff9966, #ff5e62)"; 
+      document.getElementById("startStopBtn").innerText = "Start"; document.getElementById("startStopBtn").style.background = "linear-gradient(135deg, #34d399, #10b981)"; 
       updateTimerDisplay(timerMode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
     }
 
@@ -410,7 +416,7 @@
     function fireCyberAlarm() {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       for(let i=0; i<3; i++) { setTimeout(() => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.setValueAtTime(0.2, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3); }, i*500); }
-      alert("🏆 Session Over, Utkarsh Bhai!");
+      alert("🏆 Time's Up Utkarsh Bhai!");
     }
 
     function switchView(viewKey) {
@@ -531,11 +537,11 @@
         for(let d=1; d<=totalDays; d++) { totalHours += parseInt(getItemValue(`${keyPrefix}_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10); }
         percent = totalDays ? Math.round((totalHours / (totalDays * 8)) * 100) : 0;
         document.getElementById(progressId).innerText = percent + '%';
-        document.getElementById(progressId).style.background = `conic-gradient(#00f2fe ${percent}%, #151f32 ${percent}%)`;
+        document.getElementById(progressId).style.background = `conic-gradient(#10b981 ${percent}%, #edf2f7 ${percent}%)`;
         document.getElementById(statsId).innerText = `${totalHours}h / ${totalDays * 8}h`;
       } else {
         document.getElementById(progressId).innerText = percent + '%';
-        document.getElementById(progressId).style.background = `conic-gradient(#00f2fe ${percent}%, #151f32 ${percent}%)`;
+        document.getElementById(progressId).style.background = `conic-gradient(#10b981 ${percent}%, #edf2f7 ${percent}%)`;
         document.getElementById(statsId).innerText = `${checked} / ${checkboxes.length}`;
       }
     }
@@ -576,12 +582,11 @@
       const tbody = document.getElementById('mockTableBody'); if(!tbody) return; tbody.innerHTML = '';
       const records = getMockList();
       if(records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records added yet.</td></tr>`;
-        updateMockChart([]); return;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records.</td></tr>`; updateMockChart([]); return;
       }
       records.forEach(item => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${item.date}</td><td><strong>${item.name}</strong></td><td style="color:var(--neon-blue); font-weight:700;">${item.score} / 200</td><td><span style="background:rgba(52,211,153,0.1); color:#34d399; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td><td><button style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
+        tr.innerHTML = `<td>${item.date}</td><td><strong>${item.name}</strong></td><td style="color:#2563eb; font-weight:700;">${item.score} / 200</td><td><span style="background:rgba(16,185,129,0.1); color:#10b981; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td><td><button style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
         tbody.appendChild(tr);
       });
       updateMockChart(records);
@@ -601,7 +606,7 @@
       }
       const ctx = document.getElementById('habitChart'); if (!ctx) return;
       if (habitChartInstance) habitChartInstance.destroy();
-      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#00f2fe', '#4facfe'], borderRadius: 10, barThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
+      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#10b981', '#3b82f6'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
     }
 
     function buildStudyCurveChart() {
@@ -610,14 +615,14 @@
       for (let d = 1; d <= daysInMonth; d++) { labels.push(`${d}`); data.push(parseInt(getItemValue(`study_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10)); }
       const ctx = document.getElementById('studyCurveChart'); if (!ctx) return;
       if (studyChartInstance) studyChartInstance.destroy();
-      studyChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: '#00f2fe', backgroundColor: 'rgba(0, 242, 254, 0.05)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#00f2fe', pointRadius: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 8, ticks: { stepSize: 2, color: '#64748b' } } } } });
+      studyChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.04)', borderWidth: 2.5, tension: 0.2, fill: true, pointBackgroundColor: '#10b981', pointRadius: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 8, ticks: { stepSize: 2, color: '#64748b' } } } } });
     }
 
     function updateMockChart(records) {
       const ctx = document.getElementById('mockAnalyticsChart'); if (!ctx) return;
       if (mockChartInstance) mockChartInstance.destroy();
       const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.score);
-      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#ff5e62', backgroundColor: 'rgba(255, 94, 98, 0.05)', borderWidth: 3, fill: true, tension: 0.2, pointRadius: 5, pointBackgroundColor: '#ff5e62' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
+      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#3b82f6' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
     }
 
     function renderSyllabusSheet(subjectKey) {
@@ -633,7 +638,7 @@
     }
 
     function saveSyllabusStatus(subjectKey, chNo, selectElement) { saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); selectElement.setAttribute('data-status', selectElement.value); calculateSyllabusProgress(subjectKey); }
-    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#4facfe ${percent}%, #151f32 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
+    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#10b981 ${percent}%, #f1f5f9 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
 
     function reloadCalendars() {
       document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
