@@ -7,16 +7,16 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg-main: #f4f7f6;
+      --bg-main: #edf2f4;
       --card-bg: #ffffff;
       --sidebar-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --primary-bright: #10b981;
-      --secondary-bright: #3b82f6;
-      --accent-orange: #ea580c;
+      --text-main: #2b2d42;
+      --text-muted: #8d99ae;
+      --primary-bright: #06d6a0;
+      --secondary-bright: #118ab2;
+      --accent-orange: #f77f00;
       --border-light: #e2e8f0;
-      --checked-gradient: linear-gradient(135deg, #34d399, #10b981);
+      --checked-gradient: linear-gradient(135deg, #06d6a0, #118ab2);
       --day-bg: #f8fafc;
     }
     
@@ -25,28 +25,29 @@
     
     /* Responsive Left Sidebar */
     .sidebar { width: 260px; background: var(--sidebar-bg); color: var(--text-main); padding: 25px; box-shadow: 4px 0 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--border-light); }
-    .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: #0f172a; border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
+    .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: #118ab2; border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
     .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 15px 0 6px 5px; font-weight: 800; }
     
-    .task { width: 100%; background: var(--bg-main); padding: 12px 16px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #475569; border: 1px solid transparent; transition: all 0.2s; }
-    .task:hover { background: #e2e8f0; color: #0f172a; }
-    .task.active { background: rgba(16, 185, 129, 0.1); color: #047857; border-color: rgba(16, 185, 129, 0.3); font-weight: 700; }
+    .task { width: 100%; background: #f8fafc; padding: 12px 16px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #475569; border: 1px solid transparent; transition: all 0.2s; }
+    .task:hover { background: #edf2f4; color: #118ab2; }
+    .task.active { background: rgba(6, 214, 160, 0.12); color: #059669; border-color: rgba(6, 214, 160, 0.3); font-weight: 700; }
     
     /* Main View Area */
     .main { flex: 1; display: flex; flex-direction: column; background: var(--bg-main); overflow: hidden; }
     
     .topbar { background: #ffffff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); z-index: 5; gap: 15px; flex-wrap: wrap; }
     .welcome-section { display: flex; flex-direction: column; gap: 4px; }
-    .digital-clock { font-size: 12px; font-weight: 800; color: var(--secondary-bright); letter-spacing: 0.5px; background: rgba(59, 130, 246, 0.08); padding: 4px 10px; border-radius: 6px; align-self: flex-start; display: inline-block; border: 1px solid rgba(59, 130, 246, 0.15); }
-    .welcome-greet { margin: 0; font-size: 20px; color: #0f172a; font-weight: 800; }
+    .digital-clock { font-size: 12px; font-weight: 800; color: var(--secondary-bright); letter-spacing: 0.5px; background: rgba(17, 138, 178, 0.08); padding: 4px 10px; border-radius: 6px; align-self: flex-start; display: inline-block; border: 1px solid rgba(17, 138, 178, 0.15); }
+    .welcome-greet { margin: 0; font-size: 20px; color: #2b2d42; font-weight: 800; }
+    .daily-quote { margin: 2px 0 0 0; font-size: 12px; color: #64748b; font-style: italic; font-weight: 600; }
     
     /* Backup/Fetch Controls */
     .sync-container { display: flex; gap: 8px; }
     .sync-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); cursor: pointer; font-weight: 700; font-size: 11px; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
-    .sync-btn.push { background: rgba(16, 185, 129, 0.08); border-color: #10b981; color: #10b981; }
-    .sync-btn.push:hover { background: #10b981; color: white; }
-    .sync-btn.fetch { background: rgba(59, 130, 246, 0.08); border-color: #3b82f6; color: #3b82f6; }
-    .sync-btn.fetch:hover { background: #3b82f6; color: white; }
+    .sync-btn.push { background: rgba(6, 214, 160, 0.08); border-color: var(--primary-bright); color: #059669; }
+    .sync-btn.push:hover { background: var(--primary-bright); color: white; }
+    .sync-btn.fetch { background: rgba(17, 138, 178, 0.08); border-color: var(--secondary-bright); color: var(--secondary-bright); }
+    .sync-btn.fetch:hover { background: var(--secondary-bright); color: white; }
 
     .calendar-controls { display: flex; align-items: center; gap: 10px; }
     .calendar-controls h2 { margin: 0; font-size: 15px; color: var(--text-main); font-weight: 700; min-width: 110px; text-align: center; }
@@ -58,7 +59,7 @@
     .cards-grid { display: flex; flex-direction: column; gap: 25px; width: 100%; }
     
     /* Bright Premium Cards */
-    .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; border: 1px solid var(--border-light); width: 100%; box-sizing: border-box; }
+    .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; border: 1px solid var(--border-light); width: 100%; box-sizing: border-box; }
     .card h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 8px; }
     .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; background-color: var(--primary-bright); }
     
@@ -66,7 +67,7 @@
     .chart-box { width: 100%; height: 200px; margin-top: 5px; position: relative; }
 
     /* Subject Checklist Matrix */
-    .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; background: var(--bg-main); padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); }
+    .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); }
     .subj-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; padding: 6px; border-radius: 6px; }
     .subj-item input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; }
     .subj-item.disabled { opacity: 0.3; cursor: not-allowed; }
@@ -76,9 +77,9 @@
     .weekday-header { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; text-align: center; padding-bottom: 4px; }
     
     .day { background: var(--day-bg); border: 1px solid var(--border-light); padding: 10px 2px; border-radius: 10px; text-align: center; font-size: 12px; color: #475569; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 58px; transition: all 0.2s; }
-    .day:hover:not(.locked) { background: #edf2f7; border-color: #cbd5e1; }
+    .day:hover:not(.locked) { background: #edf2f4; border-color: #cbd5e1; }
     
-    .day.checked { background: var(--checked-gradient); border-color: transparent; color: white; font-weight: 700; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
+    .day.checked { background: var(--checked-gradient); border-color: transparent; color: white; font-weight: 700; box-shadow: 0 4px 12px rgba(6, 214, 160, 0.25); }
     .day.locked { cursor: not-allowed; opacity: 0.4; background: #f1f5f9; color: #94a3b8; border-style: dashed; }
     .day.locked.checked { background: #cbd5e1; color: #64748b; opacity: 0.6; }
     
@@ -101,17 +102,17 @@
     .counter-value { font-size: 10px; font-weight: 800; min-width: 16px; text-align: center; }
     
     /* Stopwatch & Pomo Box */
-    .timer-container { background: #1e293b; color: white; padding: 15px; border-radius: 14px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .timer-container { background: #2b2d42; color: white; padding: 15px; border-radius: 14px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .timer-mode-container { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
     .mode-lbl { font-size: 9px; text-transform: uppercase; font-weight: 800; padding: 2px 6px; border-radius: 4px; cursor: pointer; background: rgba(255,255,255,0.05); color: #94a3b8; }
-    .mode-lbl.active { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .mode-lbl.active { background: rgba(6, 214, 160, 0.2); color: #06d6a0; border: 1px solid rgba(6, 214, 160, 0.3); }
     
     .timer-display { font-size: 24px; font-weight: 900; color: #f8fafc; font-family: monospace; margin-bottom: 10px; }
-    .timer-btn { background: linear-gradient(135deg, #34d399, #10b981); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 11px; margin: 0 3px; }
+    .timer-btn { background: linear-gradient(135deg, #06d6a0, #118ab2); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 11px; margin: 0 3px; }
     .timer-btn.reset { background: #475569; }
 
     /* Mocks & Tables Form Layout */
-    .mock-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: var(--bg-main); padding: 12px; border-radius: 12px; border: 1px solid var(--border-light); }
+    .mock-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border-light); }
     .mock-form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .mock-input { padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: var(--text-main); font-weight: 600; font-size: 13px; }
     .mock-btn { background: var(--checked-gradient); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
@@ -122,7 +123,7 @@
     /* Syllabus Layout Matrix */
     .syllabus-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
     .syllabus-side-card { background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--border-light); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
-    .circle-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(#10b981 0%, #f1f5f9 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; color: var(--text-main); margin: 12px 0; }
+    .circle-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(#06d6a0 0%, #edf2f4 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; color: var(--text-main); margin: 12px 0; }
     .syllabus-table-card { background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--border-light); overflow-x: auto; }
     .syllabus-table th { padding: 10px; border-bottom: 2px solid var(--border-light); color: var(--text-muted); font-size: 10px; text-transform: uppercase; text-align: left; }
     .syllabus-table td { padding: 12px 10px; border-bottom: 1px solid var(--bg-main); color: var(--text-main); font-size: 13px; font-weight: 600; }
@@ -138,10 +139,9 @@
     .stats-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
     .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(234, 88, 12, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; border: 1px solid rgba(234, 88, 12, 0.15); }
 
-    /* 📱 FULL MOBILE RESPONSIVE ENGINE CRITICAL OVERRIDES */
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
-      .sidebar { width: 100%; padding: 15px; border-right: none; border-bottom: 1px solid var(--border-light); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+      .sidebar { width: 100%; padding: 15px; border-right: none; border-bottom: 1px solid var(--border-light); }
       .sidebar h2 { margin-bottom: 10px; padding-bottom: 8px; font-size: 16px; }
       .task { padding: 10px 14px; font-size: 12px; margin: 2px 0; }
       .topbar { padding: 15px; flex-direction: column; text-align: center; gap: 12px; }
@@ -190,6 +190,7 @@
       <div class="welcome-section">
         <div class="digital-clock" id="liveClock">00:00:00 AM</div>
         <h1 class="welcome-greet" id="greetingText">Hello, Utkarsh!</h1>
+        <p class="daily-quote" id="quoteText">"Your competition is preparing while you rest. Secure your post."</p>
         <div id="streakText" class="streak-display">🔥 Study Streak: 0 Days</div>
       </div>
       
@@ -323,6 +324,14 @@
     
     let habitChartInstance = null; let studyChartInstance = null; let mockChartInstance = null;
 
+    const quotesList = [
+      "Your competition is preparing while you rest. Secure your post.",
+      "Consistency beats talent every single day. Keep grinding.",
+      "Excuses don't build empires. Put in the hours today.",
+      "The pain of discipline is nothing compared to the pain of regret.",
+      "Focus on the process, the uniform and rank will follow."
+    ];
+
     const syllabusData = {
       english: ["Parts of Speech", "Phrases", "Clauses", "Noun", "Subject Verb Agreement", "Pronoun", "Adjective", "Determiners", "Articles", "Verb", "Modals", "Tenses", "Conditional", "Mood", "Gerund", "Participle", "Infinitive", "Adverb", "Conjunction", "Preposition", "Phrasal Verbs", "Question Tag", "Voice", "Narration", "Parajumbles", "Cloze Test", "Reading Comprehension", "Fill In The Blanks"],
       math: ["Number System", "Simplification", "HCF & LCM", "Algebra", "Quadratic Equations", "Trigonometry", "Maximum & Minimum Value", "Height & Distance", "Geometry", "Coordinate Geometry", "Mensuration", "Statistics", "Probability"],
@@ -333,14 +342,16 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
+    function updateQuote() {
+      const idx = Math.floor(Math.random() * quotesList.length);
+      document.getElementById('quoteText').innerText = `"${quotesList[idx]}"`;
+    }
+
     async function backupToCloud() {
-      const btn = document.querySelector('.sync-btn.push');
-      btn.innerText = "📤 Saving...";
+      const btn = document.querySelector('.sync-btn.push'); btn.innerText = "📤 Saving...";
       try {
         let dump = {};
-        for(let i=0; i<localStorage.length; i++) {
-          let k = localStorage.key(i); dump[k] = localStorage.getItem(k);
-        }
+        for(let i=0; i<localStorage.length; i++) { let k = localStorage.key(i); dump[k] = localStorage.getItem(k); }
         let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
           method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": SECURE_KEY }, body: JSON.stringify(dump)
         });
@@ -350,15 +361,13 @@
     }
 
     async function fetchFromCloud() {
-      const btn = document.querySelector('.sync-btn.fetch');
-      btn.innerText = "📥 Loading...";
+      const btn = document.querySelector('.sync-btn.fetch'); btn.innerText = "📥 Loading...";
       try {
         let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, { headers: { "X-Master-Key": SECURE_KEY } });
         if(res.ok) {
           let incoming = await res.json();
           for(let k in incoming) { localStorage.setItem(k, incoming[k]); }
-          btn.innerText = "✅ Synced!";
-          setTimeout(() => btn.innerText = "📥 Fetch from Cloud", 2000);
+          btn.innerText = "✅ Synced!"; setTimeout(() => btn.innerText = "📥 Fetch from Cloud", 2000);
           reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
         } else { throw new Error(); }
       } catch(e) { alert("Sync Failed!"); btn.innerText = "📥 Fetch from Cloud"; }
@@ -394,7 +403,7 @@
         let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
         isTimerRunning = false; elapsedTimeBefore = currentElapsed;
         localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
-        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #34d399, #10b981)";
+        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #06d6a0, #118ab2)";
         updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore));
       } else {
         isTimerRunning = true; startTime = Date.now();
@@ -406,7 +415,7 @@
     function resetTimer() {
       isTimerRunning = false; clearInterval(clockInterval); elapsedTimeBefore = 0; startTime = 0;
       localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', '0'); localStorage.setItem('sw_start_time', '0');
-      document.getElementById("startStopBtn").innerText = "Start"; document.getElementById("startStopBtn").style.background = "linear-gradient(135deg, #34d399, #10b981)"; 
+      document.getElementById("startStopBtn").innerText = "Start"; document.getElementById("startStopBtn").style.background = "linear-gradient(135deg, #06d6a0, #118ab2)"; 
       updateTimerDisplay(timerMode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
     }
 
@@ -458,8 +467,7 @@
       const todayDay = new Date().getDate();
       const storageKey = `subj_${sub}_${currentYear}_${currentMonth}_${todayDay}`;
       const chk = document.getElementById(`chk-subj-${sub}`);
-      saveItemValue(storageKey, chk.checked);
-      calculateStreak();
+      saveItemValue(storageKey, chk.checked); calculateStreak();
     }
 
     function generateCalendar(cardId, progressId, statsId, keyPrefix, isStudy = false) {
@@ -488,10 +496,8 @@
         
         if (isLocked) { checkbox.disabled = true; } else {
           checkbox.onchange = () => {
-            saveItemValue(storageKey, checkbox.checked);
-            dayBox.classList.toggle('checked', checkbox.checked);
-            updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
-            calculateStreak(); triggerChartUpdate();
+            saveItemValue(storageKey, checkbox.checked); dayBox.classList.toggle('checked', checkbox.checked);
+            updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); calculateStreak(); triggerChartUpdate();
           };
         }
         
@@ -537,11 +543,11 @@
         for(let d=1; d<=totalDays; d++) { totalHours += parseInt(getItemValue(`${keyPrefix}_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10); }
         percent = totalDays ? Math.round((totalHours / (totalDays * 8)) * 100) : 0;
         document.getElementById(progressId).innerText = percent + '%';
-        document.getElementById(progressId).style.background = `conic-gradient(#10b981 ${percent}%, #edf2f7 ${percent}%)`;
+        document.getElementById(progressId).style.background = `conic-gradient(#06d6a0 ${percent}%, #edf2f4 ${percent}%)`;
         document.getElementById(statsId).innerText = `${totalHours}h / ${totalDays * 8}h`;
       } else {
         document.getElementById(progressId).innerText = percent + '%';
-        document.getElementById(progressId).style.background = `conic-gradient(#10b981 ${percent}%, #edf2f7 ${percent}%)`;
+        document.getElementById(progressId).style.background = `conic-gradient(#06d6a0 ${percent}%, #edf2f4 ${percent}%)`;
         document.getElementById(statsId).innerText = `${checked} / ${checkboxes.length}`;
       }
     }
@@ -581,12 +587,10 @@
     function renderMockTable() {
       const tbody = document.getElementById('mockTableBody'); if(!tbody) return; tbody.innerHTML = '';
       const records = getMockList();
-      if(records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records.</td></tr>`; updateMockChart([]); return;
-      }
+      if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records.</td></tr>`; updateMockChart([]); return; }
       records.forEach(item => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${item.date}</td><td><strong>${item.name}</strong></td><td style="color:#2563eb; font-weight:700;">${item.score} / 200</td><td><span style="background:rgba(16,185,129,0.1); color:#10b981; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td><td><button style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
+        tr.innerHTML = `<td>${item.date}</td><td><strong>${item.name}</strong></td><td style="color:#118ab2; font-weight:700;">${item.score} / 200</td><td><span style="background:rgba(6,214,160,0.12); color:#059669; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td><td><button style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
         tbody.appendChild(tr);
       });
       updateMockChart(records);
@@ -606,7 +610,7 @@
       }
       const ctx = document.getElementById('habitChart'); if (!ctx) return;
       if (habitChartInstance) habitChartInstance.destroy();
-      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#10b981', '#3b82f6'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
+      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#118ab2'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
     }
 
     function buildStudyCurveChart() {
@@ -615,14 +619,14 @@
       for (let d = 1; d <= daysInMonth; d++) { labels.push(`${d}`); data.push(parseInt(getItemValue(`study_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10)); }
       const ctx = document.getElementById('studyCurveChart'); if (!ctx) return;
       if (studyChartInstance) studyChartInstance.destroy();
-      studyChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.04)', borderWidth: 2.5, tension: 0.2, fill: true, pointBackgroundColor: '#10b981', pointRadius: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 8, ticks: { stepSize: 2, color: '#64748b' } } } } });
+      studyChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: '#06d6a0', backgroundColor: 'rgba(6, 214, 160, 0.04)', borderWidth: 2.5, tension: 0.2, fill: true, pointBackgroundColor: '#06d6a0', pointRadius: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 8, ticks: { stepSize: 2, color: '#64748b' } } } } });
     }
 
     function updateMockChart(records) {
       const ctx = document.getElementById('mockAnalyticsChart'); if (!ctx) return;
       if (mockChartInstance) mockChartInstance.destroy();
       const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.score);
-      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#3b82f6' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
+      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#118ab2', backgroundColor: 'rgba(17, 138, 178, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#118ab2' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
     }
 
     function renderSyllabusSheet(subjectKey) {
@@ -638,7 +642,7 @@
     }
 
     function saveSyllabusStatus(subjectKey, chNo, selectElement) { saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); selectElement.setAttribute('data-status', selectElement.value); calculateSyllabusProgress(subjectKey); }
-    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#10b981 ${percent}%, #f1f5f9 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
+    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#06d6a0 ${percent}%, #edf2f4 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
 
     function reloadCalendars() {
       document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -651,7 +655,7 @@
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
-    startDigitalClock(); setupHeader(); initStopwatch(); reloadCalendars(); calculateStreak(); refreshUI();
+    startDigitalClock(); setupHeader(); initStopwatch(); reloadCalendars(); calculateStreak(); updateQuote(); refreshUI();
   </script>
 </body>
 </html>
