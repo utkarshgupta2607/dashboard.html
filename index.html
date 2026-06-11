@@ -602,4 +602,56 @@
       let medCount = 0; let workCount = 0;
       for (let d = 1; d <= daysInMonth; d++) {
         if (getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`) === 'true') medCount++;
-        if (getItemValue(`workout_${currentYear}_${
+        if (getItemValue(`workout_${currentYear}_${currentMonth}_${d}`) === 'true') workCount++;
+      }
+      const ctx = document.getElementById('habitChart'); if (!ctx) return;
+      if (habitChartInstance) habitChartInstance.destroy();
+      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
+    }
+
+    function buildStudyCurveChart() {
+      const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+      let labels = []; let data = [];
+      for (let d = 1; d <= daysInMonth; d++) { labels.push(`${d}`); data.push(parseInt(getItemValue(`study_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10)); }
+      const ctx = document.getElementById('studyCurveChart'); if (!ctx) return;
+      if (studyChartInstance) studyChartInstance.destroy();
+      studyChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: '#06d6a0', backgroundColor: 'rgba(6, 214, 160, 0.04)', borderWidth: 2.5, tension: 0.2, fill: true, pointBackgroundColor: '#06d6a0', pointRadius: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 8, ticks: { stepSize: 2, color: '#64748b' } } } } });
+    }
+
+    function updateMockChart(records) {
+      const ctx = document.getElementById('mockAnalyticsChart'); if (!ctx) return;
+      if (mockChartInstance) mockChartInstance.destroy();
+      const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.score);
+      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#38bdf8' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
+    }
+
+    function renderSyllabusSheet(subjectKey) {
+      const titles = { english: "English", math: "Advanced Maths", science: "Science", reasoning: "Reasoning" };
+      document.getElementById('syllabusSubjectTitle').innerText = titles[subjectKey];
+      const tbody = document.getElementById('syllabusTableBody'); tbody.innerHTML = '';
+      syllabusData[subjectKey].forEach((chapterName, index) => {
+        const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`; const savedStatus = getItemValue(storageKey) || 'not_started'; const tr = document.createElement('tr');
+        tr.innerHTML = `<td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td><td><select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)"><option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option><option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option><option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option><option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option></select></td>`;
+        tbody.appendChild(tr);
+      });
+      calculateSyllabusProgress(subjectKey);
+    }
+
+    function saveSyllabusStatus(subjectKey, chNo, selectElement) { saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); selectElement.setAttribute('data-status', selectElement.value); calculateSyllabusProgress(subjectKey); }
+    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#06d6a0 ${percent}%, #151f32 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
+
+    function reloadCalendars() {
+      document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+      generateCalendar('meditationCalendar', 'meditationProgress', 'meditationStats', 'meditation', false);
+      generateCalendar('workoutCalendar', 'workoutProgress', 'workoutStats', 'workout', false);
+      generateCalendar('studyCalendar', 'studyProgress', 'studyStats', 'study', true);
+      renderSubjectCheckboxes(); renderOLevelM1Status(); triggerChartUpdate();
+    }
+
+    function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
+    function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
+
+    startDigitalClock(); setupHeader(); initStopwatch(); reloadCalendars(); calculateStreak(); updateQuote(); refreshUI();
+  </script>
+</body>
+</html>
