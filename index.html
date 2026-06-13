@@ -32,11 +32,6 @@
     .task:hover { background: #1e293b; color: var(--text-bright); }
     .task.active { background: rgba(52, 211, 153, 0.1); color: var(--primary-bright); border-color: rgba(52, 211, 153, 0.2); font-weight: 700; }
     
-    .dropdown-container { width: 100%; display: none; flex-direction: column; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 8px; margin-top: -2px; margin-bottom: 6px; border: 1px solid var(--border-light); }
-    .dropdown-item { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 6px 4px; color: #94a3b8; font-weight: 600; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); }
-    .dropdown-item:last-child { border-bottom: none; }
-    .dropdown-item input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--primary-bright); cursor: pointer; }
-    
     .main { flex: 1; display: flex; flex-direction: column; background: var(--bg-main); overflow: hidden; }
     .topbar { background: var(--sidebar-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); z-index: 5; gap: 15px; }
     .welcome-section { display: flex; flex-direction: column; gap: 4px; }
@@ -60,7 +55,7 @@
     
     .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; border: 1px solid var(--border-light); width: 100%; }
     .card h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; color: var(--text-bright); display: flex; align-items: center; gap: 8px; }
-    .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
+    .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
     
     .calendar-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%; }
     .chart-box { width: 100%; height: 200px; position: relative; }
@@ -159,20 +154,10 @@
     <div class="task" id="tab-reasoning" onclick="switchView('reasoning')">Reasoning Matrix</div>
 
     <div class="sidebar-section-title">NIELIT O-Level</div>
-    <div class="task" id="tab-olevel-m1" onclick="toggleOLevelDropdown()">🖥️ M1: IT Tools & Basics ▾</div>
-    <div class="dropdown-container" id="olevel-m1-dropdown">
-      <div class="dropdown-item"><input type="checkbox" id="ol-c1" onchange="saveM1Check('ol-c1')"> Ch 1: Intro to Computer</div>
-      <div class="dropdown-item"><input type="checkbox" id="ol-c2" onchange="saveM1Check('ol-c2')"> Ch 2: Intro to OS</div>
-      <div class="dropdown-item"><input type="checkbox" id="ol-c3" onchange="saveM1Check('ol-c3')"> Ch 3: Word Processing</div>
-      <div class="dropdown-item"><input type="checkbox" id="ol-c4" onchange="saveM1Check('ol-c4')"> Ch 4: Spreadsheet</div>
-      <div class="dropdown-item"><input type="checkbox" id="ol-c5" onchange="saveM1Check('ol-c5')"> Ch 5: Presentation</div>
-      <div class="dropdown-item"><input type="checkbox" id="ol-c6" onchange="saveM1Check('ol-c6')"> Ch 6: Intro to Internet</div>
-      <div class="dropdown-item"><input type="checkbox" id="ol-c7" onchange="saveM1Check('ol-c7')"> Ch 7: E-Governance/Digital Financial</div>
-      <div class="dropdown-item"><input type="checkbox" id="ol-c8" onchange="saveM1Check('ol-c8')"> Ch 8: Digital Skills & Cyber Security</div>
-    </div>
-    <div class="task" id="tab-olevel-m2" style="opacity: 0.65; cursor: default;">🌐 M2: Web Design Matrix</div>
-    <div class="task" id="tab-olevel-m3" style="opacity: 0.65; cursor: default;">🐍 M3: Python Programming</div>
-    <div class="task" id="tab-olevel-m4" style="opacity: 0.65; cursor: default;">🤖 M4: IOT Architecture</div>
+    <div class="task" id="tab-olevel_m1" onclick="switchView('olevel_m1')">🖥️ M1: IT Tools & Network</div>
+    <div class="task" id="tab-olevel_m2" onclick="switchView('olevel_m2')">🌐 M2: Web Design</div>
+    <div class="task" id="tab-olevel_m3" onclick="switchView('olevel_m3')">🐍 M3: Python Language</div>
+    <div class="task" id="tab-olevel_m4" onclick="switchView('olevel_m4')">🤖 M4: IoT Architecture</div>
   </div>
 
   <div class="main">
@@ -322,34 +307,20 @@
       "Focus on the process, the uniform and rank will follow."
     ];
 
+    // INTEGRATED O-LEVEL COMPLETE 4 MODULE CHAPTERS REGISTRY
     const syllabusData = {
       english: ["Parts of Speech", "Phrases", "Clauses", "Noun", "Subject Verb Agreement", "Pronoun", "Adjective", "Determiners", "Articles", "Verb", "Modals", "Tenses", "Conditional", "Mood", "Gerund", "Participle", "Infinitive", "Adverb", "Conjunction", "Preposition", "Phrasal Verbs", "Question Tag", "Voice", "Narration", "Parajumbles", "Cloze Test", "Reading Comprehension", "Fill In The Blanks"],
       math: ["Number System", "Simplification", "HCF & LCM", "Algebra", "Quadratic Equations", "Trigonometry", "Maximum & Minimum Value", "Height & Distance", "Geometry", "Coordinate Geometry", "Mensuration", "Statistics", "Probability"],
       science: ["Cell", "Digestive System", "Circulatory System", "Respiratory System", "Brain & Nervous System", "Excretory System", "Blood", "Vitamins", "Nutrition", "Disease", "Endocrine Glands", "Skeleton System", "Reproduction", "Plant Kingdom", "Animal Kingdom", "Tissues", "Matter & Atom", "Metals & Non Metals", "Acid Base & Salt", "Carbon & Its Compound", "Periodic Table", "Chemical Reaction", "Chemistry in Every Day Life & Law of Gases", "Motion & Force", "Gravitation Work Energy", "Optics & Human Eye", "Sound", "Electricity", "Magnetic Effect & Heating Effect of Current", "Doubt & Practice Session"],
-      reasoning: ["Alphanumeric Series", "Blood Relation", "Mathematical Operations", "Word Building", "Logical Sequence Test", "Inserting the Missing", "Clock", "Paper Folding & Cutting", "Counting of Figures", "Coding Decoding", "Number Series", "Image", "Calendar", "Dice", "Alphabet Test", "Inequality", "Analogy", "Classification", "Logical Venn Diagram", "Syllogism", "Distance & Direction", "Seating Arrangement", "Puzzle", "Ranking Order", "Data Sufficiency", "Statement Based Question", "Cube & Cuboid"]
+      reasoning: ["Alphanumeric Series", "Blood Relation", "Mathematical Operations", "Word Building", "Logical Sequence Test", "Inserting the Missing", "Clock", "Paper Folding & Cutting", "Counting of Figures", "Coding Decoding", "Number Series", "Image", "Calendar", "Dice", "Alphabet Test", "Inequality", "Analogy", "Classification", "Logical Venn Diagram", "Syllogism", "Distance & Direction", "Seating Arrangement", "Puzzle", "Ranking Order", "Data Sufficiency", "Statement Based Question", "Cube & Cuboid"],
+      olevel_m1: ["Introduction to Computer", "Introduction to Operating System", "Word Processing (MS Word/LibreOffice)", "Spreadsheet Package (Excel)", "Presentation Software (PowerPoint)", "Introduction to Internet and WWW", "E-Governance & Digital Financial Tools", "Overview of Future Skills & Cyber Security"],
+      olevel_m2: ["Introduction to Web Design & Editors", "HTML Basics & Advanced Layouts", "CSS Stylesheets & Styling", "CSS Frameworks (Bootstrap)", "JavaScript Core Programming", "Photo Editor & Graphics", "Web Publishing and Browsing Concepts"],
+      olevel_m3: ["Introduction to Programming & Algorithms", "Algorithms and Flowcharts to Solve Problems", "Introduction to Python Core Syntax", "Operators, Expressions & Python Statements", "Decision Making Statements & Loops", "Python Functions & Modules", "Strings, Lists, Tuples & Dictionaries", "File Processing & Exception Handling"],
+      olevel_m4: ["Introduction to IoT Ecosystem", "IoT Physical Devices and Endpoints", "Microcontroller & Sensors Architecture", "IoT Protocols and Communication", "Arduino / Raspberry Pi Programming", "IoT Security and Cloud Integration"]
     };
 
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
-
-    function toggleOLevelDropdown() {
-      const drop = document.getElementById('olevel-m1-dropdown');
-      drop.style.display = (drop.style.display === 'flex') ? 'none' : 'flex';
-    }
-
-    function saveM1Check(id) {
-      const chk = document.getElementById(id);
-      saveItemValue(`olevel_m1_done_${id}`, chk.checked);
-    }
-
-    // Fixed Bug: Properly rendered checklist synchronization loops on setup 
-    function renderOLevelM1Status() {
-      for (let i = 1; i <= 8; i++) {
-        const id = `ol-c${i}`;
-        const chk = document.getElementById(id);
-        if (chk) chk.checked = getItemValue(`olevel_m1_done_${id}`) === 'true';
-      }
-    }
 
     function exportDataString() {
       let dump = {};
@@ -427,9 +398,12 @@
       currentActiveTab = viewKey;
       document.querySelectorAll('.task').forEach(t => t.classList.remove('active'));
       if(document.getElementById(`tab-${viewKey}`)) document.getElementById(`tab-${viewKey}`).classList.add('active');
+      
       document.getElementById('view-self').style.display = (viewKey === 'self') ? 'flex' : 'none';
       document.getElementById('view-study').style.display = (viewKey === 'study') ? 'flex' : 'none';
       document.getElementById('view-mocks').style.display = (viewKey === 'mocks') ? 'flex' : 'none';
+      
+      // FIXED LEAOUT TUNNEL: Smartly handles syllabus tab distribution
       document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study' && viewKey !== 'mocks') ? 'grid' : 'none';
       document.getElementById('calControls').style.display = (viewKey === 'self' || viewKey === 'study') ? 'flex' : 'none';
       refreshUI();
@@ -608,7 +582,6 @@
       habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
     }
 
-    // FIXED VARIABLE MATCH ENGINE
     function buildStudyCurveChart() {
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
       let labels = []; let data = [];
@@ -622,30 +595,64 @@
       const ctx = document.getElementById('mockAnalyticsChart'); if (!ctx) return;
       if (mockChartInstance) mockChartInstance.destroy();
       const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.score);
-      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#38bdf8' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
+      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#118ab2', backgroundColor: 'rgba(17, 138, 178, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#118ab2' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
     }
 
+    // FIXED SYLLABUS DISPATCH MATRIX ENGINE FOR BOTH SSC & ALL 4 O-LEVEL MODULES
     function renderSyllabusSheet(subjectKey) {
-      const titles = { english: "English", math: "Advanced Maths", science: "Science", reasoning: "Reasoning" };
-      document.getElementById('syllabusSubjectTitle').innerText = titles[subjectKey];
+      const titles = { 
+        english: "English Grammar", math: "Advanced Maths", science: "Science Module", reasoning: "Reasoning Matrix",
+        olevel_m1: "O-Level M1: IT Tools & Network Basics",
+        olevel_m2: "O-Level M2: Web Design & Publishing",
+        olevel_m3: "O-Level M3: Python Programming Language",
+        olevel_m4: "O-Level M4: Internet of Things (IoT) Architecture"
+      };
+      document.getElementById('syllabusSubjectTitle').innerText = titles[subjectKey] || "Syllabus";
       const tbody = document.getElementById('syllabusTableBody'); tbody.innerHTML = '';
+      
       syllabusData[subjectKey].forEach((chapterName, index) => {
-        const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`; const savedStatus = getItemValue(storageKey) || 'not_started'; const tr = document.createElement('tr');
-        tr.innerHTML = `<td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td><td><select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)"><option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option><option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option><option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option><option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option></select></td>`;
+        const chNo = index + 1; 
+        const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`; 
+        const savedStatus = getItemValue(storageKey) || 'not_started'; 
+        const tr = document.createElement('tr');
+        
+        tr.innerHTML = `
+          <td>#${chNo < 10 ? '0'+chNo : chNo}</td>
+          <td>${chapterName}</td>
+          <td>
+            <select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)">
+              <option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option>
+              <option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option>
+              <option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option>
+              <option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option>
+            </select>
+          </td>`;
         tbody.appendChild(tr);
       });
       calculateSyllabusProgress(subjectKey);
     }
 
-    function saveSyllabusStatus(subjectKey, chNo, selectElement) { saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); selectElement.setAttribute('data-status', selectElement.value); calculateSyllabusProgress(subjectKey); }
-    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#06d6a0 ${percent}%, #edf2f4 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
+    function saveSyllabusStatus(subjectKey, chNo, selectElement) { 
+      saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); 
+      selectElement.setAttribute('data-status', selectElement.value); 
+      calculateSyllabusProgress(subjectKey); 
+    }
+    
+    function calculateSyllabusProgress(subjectKey) { 
+      let completed = 0; 
+      syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); 
+      const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; 
+      document.getElementById('syllabusCircle').innerText = `${percent}%`; 
+      document.getElementById('syllabusCircle').style.background = `conic-gradient(#06d6a0 ${percent}%, #151f32 ${percent}%)`; 
+      document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; 
+    }
 
     function reloadCalendars() {
       document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
       generateCalendar('meditationCalendar', 'meditationProgress', 'meditationStats', 'meditation', false);
       generateCalendar('workoutCalendar', 'workoutProgress', 'workoutStats', 'workout', false);
       generateCalendar('studyCalendar', 'studyProgress', 'studyStats', 'study', true);
-      renderSubjectCheckboxes(); renderOLevelM1Status(); triggerChartUpdate();
+      renderSubjectCheckboxes(); triggerChartUpdate();
     }
 
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
