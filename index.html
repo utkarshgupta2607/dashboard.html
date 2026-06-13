@@ -66,7 +66,7 @@
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
     .weekday-header { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; }
     
-    .day { background: var(--day-bg); border: 1px solid var(--border-light); padding: 8px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: var(--text-main); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 75px; height: auto; }
+    .day { background: var(--day-bg); border: 1px solid var(--border-light); padding: 8px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: var(--text-main); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 75px; height: auto; overflow: hidden; }
     .day.checked { background: var(--checked-gradient); border-color: transparent; color: var(--text-bright); font-weight: 700; box-shadow: 0 4px 15px rgba(5, 149, 105, 0.3); }
     .day.locked { cursor: not-allowed; opacity: 0.3; background: #0f1622; border-style: dashed; }
     .day.locked.checked { background: #475569; color: #cbd5e1; }
@@ -78,11 +78,12 @@
     .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: var(--primary-bright); font-size: 11px; font-weight: 900; }
     .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
 
-    .counter-container { display: flex; align-items: center; justify-content: space-between; gap: 2px; margin-top: auto; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 6px; width: 100%; max-width: 48px; }
+    /* FIXED COUNTER CONTAINER: Perfectly locked alignment box */
+    .counter-container { display: flex; align-items: center; justify-content: space-between; gap: 2px; margin-top: auto; background: rgba(0,0,0,0.3); padding: 2px; border-radius: 6px; width: 100%; max-width: 52px; }
     .day.checked .counter-container { background: rgba(255,255,255,0.15); }
-    .counter-btn { background: #475569; color: white; border: none; font-size: 9px; font-weight: 900; width: 14px; height: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .counter-btn { background: #475569; color: white; border: none; font-size: 9px; font-weight: 900; width: 15px; height: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
     .day.checked .counter-btn { background: #fff; color: var(--primary-bright); }
-    .counter-value { font-size: 10px; font-weight: 800; text-align: center; width: 14px; color: var(--text-bright); }
+    .counter-value { font-size: 10px; font-weight: 800; text-align: center; width: 16px; color: var(--text-bright); display: inline-block; line-height: 1; }
     
     .timer-container { background: #1e293b; color: white; padding: 15px; border-radius: 14px; text-align: center; margin-bottom: 20px; width: 100%; border: 1px solid var(--border-light); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     .timer-mode-container { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
@@ -120,7 +121,14 @@
       .calendar-controls { width: 100%; justify-content: center; }
       .cards-zone { padding: 15px; }
       .calendar-grid-row { grid-template-columns: 1fr; }
-      .day { min-height: 80px; padding: 6px 1px; }
+      
+      /* CRITICAL MOBILE RESIZING FOR COUNTER FIELDS */
+      .calendar { grid-gap: 4px; }
+      .day { min-height: 72px; padding: 4px 1px; font-size: 11px; }
+      .counter-container { max-width: 100%; width: 95%; padding: 1px 2px; }
+      .counter-value { font-size: 9px; width: 12px; }
+      .counter-btn { width: 13px; height: 13px; font-size: 8px; }
+      
       .subj-check-grid { grid-template-columns: repeat(2, 1fr); }
       .mock-form-row { grid-template-columns: 1fr; }
       .syllabus-layout { grid-template-columns: 1fr; }
@@ -307,7 +315,6 @@
       "Focus on the process, the uniform and rank will follow."
     ];
 
-    // INTEGRATED O-LEVEL COMPLETE 4 MODULE CHAPTERS REGISTRY
     const syllabusData = {
       english: ["Parts of Speech", "Phrases", "Clauses", "Noun", "Subject Verb Agreement", "Pronoun", "Adjective", "Determiners", "Articles", "Verb", "Modals", "Tenses", "Conditional", "Mood", "Gerund", "Participle", "Infinitive", "Adverb", "Conjunction", "Preposition", "Phrasal Verbs", "Question Tag", "Voice", "Narration", "Parajumbles", "Cloze Test", "Reading Comprehension", "Fill In The Blanks"],
       math: ["Number System", "Simplification", "HCF & LCM", "Algebra", "Quadratic Equations", "Trigonometry", "Maximum & Minimum Value", "Height & Distance", "Geometry", "Coordinate Geometry", "Mensuration", "Statistics", "Probability"],
@@ -403,7 +410,6 @@
       document.getElementById('view-study').style.display = (viewKey === 'study') ? 'flex' : 'none';
       document.getElementById('view-mocks').style.display = (viewKey === 'mocks') ? 'flex' : 'none';
       
-      // FIXED LEAOUT TUNNEL: Smartly handles syllabus tab distribution
       document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study' && viewKey !== 'mocks') ? 'grid' : 'none';
       document.getElementById('calControls').style.display = (viewKey === 'self' || viewKey === 'study') ? 'flex' : 'none';
       refreshUI();
@@ -579,7 +585,7 @@
       }
       const ctx = document.getElementById('habitChart'); if (!ctx) return;
       if (habitChartInstance) habitChartInstance.destroy();
-      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation Sessions', 'Workout Sessions'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
+      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
     }
 
     function buildStudyCurveChart() {
@@ -595,10 +601,9 @@
       const ctx = document.getElementById('mockAnalyticsChart'); if (!ctx) return;
       if (mockChartInstance) mockChartInstance.destroy();
       const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.score);
-      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#118ab2', backgroundColor: 'rgba(17, 138, 178, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#118ab2' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
+      mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#38bdf8' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
     }
 
-    // FIXED SYLLABUS DISPATCH MATRIX ENGINE FOR BOTH SSC & ALL 4 O-LEVEL MODULES
     function renderSyllabusSheet(subjectKey) {
       const titles = { 
         english: "English Grammar", math: "Advanced Maths", science: "Science Module", reasoning: "Reasoning Matrix",
@@ -611,41 +616,15 @@
       const tbody = document.getElementById('syllabusTableBody'); tbody.innerHTML = '';
       
       syllabusData[subjectKey].forEach((chapterName, index) => {
-        const chNo = index + 1; 
-        const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`; 
-        const savedStatus = getItemValue(storageKey) || 'not_started'; 
-        const tr = document.createElement('tr');
-        
-        tr.innerHTML = `
-          <td>#${chNo < 10 ? '0'+chNo : chNo}</td>
-          <td>${chapterName}</td>
-          <td>
-            <select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)">
-              <option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option>
-              <option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option>
-              <option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option>
-              <option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option>
-            </select>
-          </td>`;
+        const chNo = index + 1; const storageKey = `surya_2026_${subjectKey}_ch_${chNo}`; const savedStatus = getItemValue(storageKey) || 'not_started'; const tr = document.createElement('tr');
+        tr.innerHTML = `<td>#${chNo < 10 ? '0'+chNo : chNo}</td><td>${chapterName}</td><td><select class="status-select" data-status="${savedStatus}" onchange="saveSyllabusStatus('${subjectKey}', ${chNo}, this)"><option value="not_started" ${savedStatus==='not_started'?'selected':''}>❌ Not Started</option><option value="in_progress" ${savedStatus==='in_progress'?'selected':''}>⏳ In Progress</option><option value="revision" ${savedStatus==='revision'?'selected':''}>📝 Revision/DPP</option><option value="completed" ${savedStatus==='completed'?'selected':''}>✅ Completed</option></select></td>`;
         tbody.appendChild(tr);
       });
       calculateSyllabusProgress(subjectKey);
     }
 
-    function saveSyllabusStatus(subjectKey, chNo, selectElement) { 
-      saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); 
-      selectElement.setAttribute('data-status', selectElement.value); 
-      calculateSyllabusProgress(subjectKey); 
-    }
-    
-    function calculateSyllabusProgress(subjectKey) { 
-      let completed = 0; 
-      syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); 
-      const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; 
-      document.getElementById('syllabusCircle').innerText = `${percent}%`; 
-      document.getElementById('syllabusCircle').style.background = `conic-gradient(#06d6a0 ${percent}%, #151f32 ${percent}%)`; 
-      document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; 
-    }
+    function saveSyllabusStatus(subjectKey, chNo, selectElement) { saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); selectElement.setAttribute('data-status', selectElement.value); calculateSyllabusProgress(subjectKey); }
+    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; document.getElementById('syllabusCircle').innerText = `${percent}%`; document.getElementById('syllabusCircle').style.background = `conic-gradient(#06d6a0 ${percent}%, #151f32 ${percent}%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
 
     function reloadCalendars() {
       document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
