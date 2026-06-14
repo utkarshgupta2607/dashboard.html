@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level Dashboard - Utkarsh</title>
+  <title>Mission CGL 2026 & O-Level Dashboard - Complete Surya 2.0</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -28,7 +28,7 @@
     .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
     .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 15px 0 6px 5px; font-weight: 800; }
     
-    .task { width: 100%; background: #151f32; padding: 12px 16px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.2s; }
+    .task { width: 100%; background: #151f32; padding: 10px 14px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.2s; }
     .task:hover { background: #1e293b; color: var(--text-bright); }
     .task.active { background: rgba(52, 211, 153, 0.1); color: var(--primary-bright); border-color: rgba(52, 211, 153, 0.2); font-weight: 700; }
     
@@ -78,7 +78,6 @@
     .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: var(--primary-bright); font-size: 11px; font-weight: 900; }
     .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
 
-    /* FIXED COUNTER CONTAINER: Perfectly locked alignment box */
     .counter-container { display: flex; align-items: center; justify-content: space-between; gap: 2px; margin-top: auto; background: rgba(0,0,0,0.3); padding: 2px; border-radius: 6px; width: 100%; max-width: 52px; }
     .day.checked .counter-container { background: rgba(255,255,255,0.15); }
     .counter-btn { background: #475569; color: white; border: none; font-size: 9px; font-weight: 900; width: 15px; height: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
@@ -104,13 +103,16 @@
     .syllabus-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
     .syllabus-side-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
     .circle-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(#059669 0%, #151f32 0%); display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; margin: 12px 0; color: var(--text-bright); }
-    .syllabus-table-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); overflow-x: auto; }
+    .syllabus-table-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); overflow-x: auto; width: 100%; }
+    
+    .syllabus-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .syllabus-table th, .syllabus-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 600; }
     .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #475569; font-weight: 700; cursor: pointer; width: 100%; background: var(--bg-main); color: white; }
     
     .progress-container { margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; }
     .mini-circle { width: 34px; height: 34px; border-radius: 50%; background: var(--day-bg); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); }
     .stats-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
-    .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(251, 146, 60, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; border: 1px solid rgba(251, 146, 60, 0.15); }
+    .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(251, 146, 60, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; border: 1px solid rgba(251, 146, 60, 0.15); }
 
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
@@ -122,14 +124,13 @@
       .cards-zone { padding: 15px; }
       .calendar-grid-row { grid-template-columns: 1fr; }
       
-      /* CRITICAL MOBILE RESIZING FOR COUNTER FIELDS */
       .calendar { grid-gap: 4px; }
       .day { min-height: 72px; padding: 4px 1px; font-size: 11px; }
       .counter-container { max-width: 100%; width: 95%; padding: 1px 2px; }
       .counter-value { font-size: 9px; width: 12px; }
       .counter-btn { width: 13px; height: 13px; font-size: 8px; }
       
-      .subj-check-grid { grid-template-columns: repeat(2, 1fr); }
+      .subj-check-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .mock-form-row { grid-template-columns: 1fr; }
       .syllabus-layout { grid-template-columns: 1fr; }
     }
@@ -155,11 +156,19 @@
     <div class="task" id="tab-study" onclick="switchView('study')">Study Architecture</div>
     <div class="task" id="tab-mocks" onclick="switchView('mocks')">📈 Mock Analytics</div>
     
-    <div class="sidebar-section-title">Surya 2.0 Syllabus</div>
-    <div class="task" id="tab-english" onclick="switchView('english')">English Grammar</div>
-    <div class="task" id="tab-math" onclick="switchView('math')">Advanced Maths</div>
-    <div class="task" id="tab-science" onclick="switchView('science')">Science Module</div>
-    <div class="task" id="tab-reasoning" onclick="switchView('reasoning')">Reasoning Matrix</div>
+    <div class="sidebar-section-title">Surya 2.0 Batch Syllabus</div>
+    <div class="task" id="tab-math" onclick="switchView('math')">📐 Advanced Maths</div>
+    <div class="task" id="tab-english" onclick="switchView('english')">📖 English Grammar</div>
+    <div class="task" id="tab-reasoning" onclick="switchView('reasoning')">🧠 Reasoning Matrix</div>
+    <div class="task" id="tab-science" onclick="switchView('science')">🔬 Science Module</div>
+    <div class="task" id="tab-history" onclick="switchView('history')">📜 History Chronicles</div>
+    <div class="task" id="tab-geography" onclick="switchView('geography')">🌍 Geography Axis</div>
+    <div class="task" id="tab-polity" onclick="switchView('polity')">⚖️ Indian Polity</div>
+    <div class="task" id="tab-economics" onclick="switchView('economics')">📊 Indian Economics</div>
+    <div class="task" id="tab-static_gk" onclick="switchView('static_gk')">💡 Static GK Chest</div>
+    <div class="task" id="tab-computer" onclick="switchView('computer')">💻 Computer Capsule</div>
+    <div class="task" id="tab-current_affairs" onclick="switchView('current_affairs')">📰 Current Affairs</div>
+    <div class="task" id="tab-hindi" onclick="switchView('hindi')">✍️ Hindi Core</div>
 
     <div class="sidebar-section-title">NIELIT O-Level</div>
     <div class="task" id="tab-olevel_m1" onclick="switchView('olevel_m1')">🖥️ M1: IT Tools & Network</div>
@@ -187,7 +196,7 @@
 
       <div class="calendar-controls" id="calControls">
         <button onclick="prevMonth()">◀</button>
-        <h2 id="monthTitle">May 2026</h2>
+        <h2 id="monthTitle">June 2026</h2>
         <button onclick="nextMonth()">▶</button>
       </div>
     </div>
@@ -318,8 +327,16 @@
     const syllabusData = {
       english: ["Parts of Speech", "Phrases", "Clauses", "Noun", "Subject Verb Agreement", "Pronoun", "Adjective", "Determiners", "Articles", "Verb", "Modals", "Tenses", "Conditional", "Mood", "Gerund", "Participle", "Infinitive", "Adverb", "Conjunction", "Preposition", "Phrasal Verbs", "Question Tag", "Voice", "Narration", "Parajumbles", "Cloze Test", "Reading Comprehension", "Fill In The Blanks"],
       math: ["Number System", "Simplification", "HCF & LCM", "Algebra", "Quadratic Equations", "Trigonometry", "Maximum & Minimum Value", "Height & Distance", "Geometry", "Coordinate Geometry", "Mensuration", "Statistics", "Probability"],
-      science: ["Cell", "Digestive System", "Circulatory System", "Respiratory System", "Brain & Nervous System", "Excretory System", "Blood", "Vitamins", "Nutrition", "Disease", "Endocrine Glands", "Skeleton System", "Reproduction", "Plant Kingdom", "Animal Kingdom", "Tissues", "Matter & Atom", "Metals & Non Metals", "Acid Base & Salt", "Carbon & Its Compound", "Periodic Table", "Chemical Reaction", "Chemistry in Every Day Life & Law of Gases", "Motion & Force", "Gravitation Work Energy", "Optics & Human Eye", "Sound", "Electricity", "Magnetic Effect & Heating Effect of Current", "Doubt & Practice Session"],
+      science: ["Cell", "Digestive System", "Circulatory System", "Respiratory System", "Brain & Nervous System", "Excretory System", "Blood", "Vitamins", "Nutrition", "Disease", "Endocrine Glands", "Skeleton System", "Reproduction", "Plant Kingdom", "Animal Kingdom", "Tissues", "Matter & Atom", "Metals & Non Metals", "Acid Base & Salt", "Carbon & Its Compound", "Periodic Table", "Chemical Reaction", "Chemistry in Every Day Life & Law of Gases", "Motion & Force", "Gravitation Work Energy", "Optics & Human Eye", "Sound", "Electricity", "Magnetic Effect & Heating Effect of Current"],
       reasoning: ["Alphanumeric Series", "Blood Relation", "Mathematical Operations", "Word Building", "Logical Sequence Test", "Inserting the Missing", "Clock", "Paper Folding & Cutting", "Counting of Figures", "Coding Decoding", "Number Series", "Image", "Calendar", "Dice", "Alphabet Test", "Inequality", "Analogy", "Classification", "Logical Venn Diagram", "Syllogism", "Distance & Direction", "Seating Arrangement", "Puzzle", "Ranking Order", "Data Sufficiency", "Statement Based Question", "Cube & Cuboid"],
+      history: ["Ancient: Indus Valley Civilization", "Ancient: Vedic Age & Buddhism/Jainism", "Ancient: Mauryan & Gupta Empire", "Medieval: Delhi Sultanate", "Medieval: Mughal Empire & Marathas", "Modern: Revolt of 1857 & British Raj", "Modern: Indian National Movement & Gandhi Era"],
+      geography: ["Physical Geography: Earth Structure & Landforms", "Climate, Atmosphere & Oceans", "Indian Geography: Rivers & Mountains", "Indian Climate, Soil & Agriculture", "Mineral Resources & Industrial Geography", "World Geography Axis & Solar System"],
+      polity: ["Making of Constitution & Preamble", "Fundamental Rights & Duties", "Directive Principles of State Policy (DPSP)", "The Union: Executive, President & PM", "Parliament: Lok Sabha & Rajya Sabha", "State Judiciary & Supreme Court / High Courts", "Constitutional & Non-Constitutional Bodies"],
+      economics: ["Introduction to Micro/Macro Economics", "National Income & GDP Calculation", "Inflation, Deflation & Business Cycles", "Indian Banking System & RBI Monetary Policy", "Public Finance, Budget & Taxation", "Economic Planning, NITI Aayog & Schemes"],
+      static_gk: ["Dances of India (Classical & Folk)", "National Parks & Wildlife Sanctuaries", "Important Monuments, Temples & Heritage Sites", "First in India & World (Male/Female)", "International Organizations & Headquarters", "Famous Books & Authors", "Sports Ecosystem: Trophies, Terms & Awards"],
+      computer: ["Computer Fundamentals & Generations", "Hardware: CPU, Input/Output Devices", "Computer Memory: Primary & Secondary", "Software, Operating Systems & Programming Languages", "Data Representation & Binary Arithmetic", "Computer Networks, Internet & Protocols", "Cyber Security, Malware & Antivirus Basics"],
+      current_affairs: ["Monthly Core Compilations", "National & International Summits", "Government Appointments & Resignations", "Defense Exercises & Operations", "Awards, Honors & Nobel Prizes", "Economic Surveys & Rankings / Indices"],
+      hindi: ["Varnamala Aur Dhwani Vichar", "Shabd Bhed (Tatsam, Tadbhav, Deshaj, Videshi)", "Sangya, Sarvanam, Visheshon, Kriya", "Sandhi Aur Samas Core Rules", "Paryayvachi Aur Vilom Shabd", "Muhavare, Lokoktiyan Aur Vakya Shuddhi"],
       olevel_m1: ["Introduction to Computer", "Introduction to Operating System", "Word Processing (MS Word/LibreOffice)", "Spreadsheet Package (Excel)", "Presentation Software (PowerPoint)", "Introduction to Internet and WWW", "E-Governance & Digital Financial Tools", "Overview of Future Skills & Cyber Security"],
       olevel_m2: ["Introduction to Web Design & Editors", "HTML Basics & Advanced Layouts", "CSS Stylesheets & Styling", "CSS Frameworks (Bootstrap)", "JavaScript Core Programming", "Photo Editor & Graphics", "Web Publishing and Browsing Concepts"],
       olevel_m3: ["Introduction to Programming & Algorithms", "Algorithms and Flowcharts to Solve Problems", "Introduction to Python Core Syntax", "Operators, Expressions & Python Statements", "Decision Making Statements & Loops", "Python Functions & Modules", "Strings, Lists, Tuples & Dictionaries", "File Processing & Exception Handling"],
@@ -576,6 +593,7 @@
       if (currentActiveTab === 'study') buildStudyCurveChart();
     }
 
+    // FIXED: Added 'Workout' back into the Chart.js labels list array
     function buildHabitChart() {
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
       let medCount = 0; let workCount = 0;
@@ -585,7 +603,7 @@
       }
       const ctx = document.getElementById('habitChart'); if (!ctx) return;
       if (habitChartInstance) habitChartInstance.destroy();
-      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
+      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation', 'Workout'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
     }
 
     function buildStudyCurveChart() {
@@ -606,11 +624,11 @@
 
     function renderSyllabusSheet(subjectKey) {
       const titles = { 
-        english: "English Grammar", math: "Advanced Maths", science: "Science Module", reasoning: "Reasoning Matrix",
-        olevel_m1: "O-Level M1: IT Tools & Network Basics",
-        olevel_m2: "O-Level M2: Web Design & Publishing",
-        olevel_m3: "O-Level M3: Python Programming Language",
-        olevel_m4: "O-Level M4: Internet of Things (IoT) Architecture"
+        math: "Advanced Maths", english: "English Grammar", reasoning: "Reasoning Matrix", science: "Science Module",
+        history: "History Chronicles", geography: "Geography Axis", polity: "Indian Polity", economics: "Indian Economics",
+        static_gk: "Static GK Chest", computer: "Computer Capsule", current_affairs: "Current Affairs", hindi: "Hindi Core",
+        olevel_m1: "O-Level M1: IT Tools & Network Basics", olevel_m2: "O-Level M2: Web Design & Publishing",
+        olevel_m3: "O-Level M3: Python Programming Language", olevel_m4: "O-Level M4: Internet of Things (IoT) Architecture"
       };
       document.getElementById('syllabusSubjectTitle').innerText = titles[subjectKey] || "Syllabus";
       const tbody = document.getElementById('syllabusTableBody'); tbody.innerHTML = '';
