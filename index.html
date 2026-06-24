@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mission CGL 2026 & O-Level Dashboard - Complete Surya 2.0</title>
+  <!-- Load Chart.js for premium graphics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -19,6 +20,8 @@
       --border-light: rgba(255, 255, 255, 0.05);
       --checked-gradient: linear-gradient(135deg, #059669, #0284c7);
       --day-bg: #151f32;
+      /* NEW BRIGHT COLOR FOR HABIT PROGRESS CIRCLES */
+      --habit-circle-color: #ffb703;
     }
     
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -110,9 +113,10 @@
     .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #475569; font-weight: 700; cursor: pointer; width: 100%; background: var(--bg-main); color: white; }
     
     .progress-container { margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+    /* FIXED COMPACT HABIT MINI CIRCLE BACKGROUNDS COLOR */
     .mini-circle { width: 34px; height: 34px; border-radius: 50%; background: var(--day-bg); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); }
     .stats-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
-    .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(251, 146, 60, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; border: 1px solid rgba(251, 146, 60, 0.15); }
+    .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(251, 146, 60, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; border: 1px solid rgba(251, 146, 60, 0.15); }
 
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
@@ -191,7 +195,7 @@
           <button class="sync-btn export" onclick="exportDataString()">📤 Backup</button>
           <button class="sync-btn import" onclick="importDataString()">📥 Fetch</button>
         </div>
-        <input type="text" id="syncTokenField" class="sync-input" placeholder="Data Code String" onclick="this.select()">
+        <input type="text" id="syncTokenField" class="sync-input" placeholder="Data Pin Code" onclick="this.select()">
       </div>
 
       <div class="calendar-controls" id="calControls">
@@ -346,20 +350,54 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
+    // ⚡ NEW COMPACT PIN CODER UTILITY ENGINE (Short Code Hash)
+    function hashCode(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash).toString(36).substring(0, 6).toUpperCase();
+    }
+
     function exportDataString() {
       let dump = {};
-      for(let i=0; i<localStorage.length; i++) { let k = localStorage.key(i); if(!k.startsWith('Chart')) dump[k] = localStorage.getItem(k); }
-      let encoded = btoa(encodeURIComponent(JSON.stringify(dump)));
-      document.getElementById('syncTokenField').value = encoded; navigator.clipboard.writeText(encoded);
-      alert("✅ Data Code Copied! Paste it on your other device and press Fetch.");
+      for(let i=0; i<localStorage.length; i++) { 
+        let k = localStorage.key(i); 
+        if(!k.startsWith('Chart')) dump[k] = localStorage.getItem(k); 
+      }
+      let rawString = JSON.stringify(dump);
+      let shortPin = hashCode(rawString);
+      
+      // Mirror the raw string against the pin inside localStorage vault
+      saveItemValue('pin_vault_' + shortPin, btoa(encodeURIComponent(rawString)));
+      
+      document.getElementById('syncTokenField').value = shortPin; 
+      navigator.clipboard.writeText(shortPin);
+      alert("✅ Mini Backup PIN Generated & Copied: " + shortPin);
     }
 
     function importDataString() {
-      let val = document.getElementById('syncTokenField').value.trim(); if(!val) { alert("Paste Code String first!"); return; }
+      let pin = document.getElementById('syncTokenField').value.trim().toUpperCase(); 
+      if(!pin) { alert("Please type your 5-6 Digit Pin Code first!"); return; }
+      
+      let matchedData = getItemValue('pin_vault_' + pin);
+      if(!matchedData) {
+        alert("❌ Local mirror code match failed! If cross-device syncing, paste the raw transfer string.");
+        try {
+          let decoded = JSON.parse(decodeURIComponent(atob(pin)));
+          for(let k in decoded) { localStorage.setItem(k, decoded[k]); }
+          alert("🎉 Synced Raw Successfully!"); reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
+        } catch(err) { alert("Invalid Code Object!"); }
+        return;
+      }
+      
       try {
-        let decoded = JSON.parse(decodeURIComponent(atob(val))); for(let k in decoded) { localStorage.setItem(k, decoded[k]); }
-        alert("🎉 Synced Successfully!"); reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
-      } catch(e) { alert("Invalid Code String!"); }
+        let decoded = JSON.parse(decodeURIComponent(atob(matchedData))); 
+        for(let k in decoded) { localStorage.setItem(k, decoded[k]); }
+        alert("🎉 Synced Perfectly using Pin Code!"); 
+        reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
+      } catch(e) { alert("Invalid Vault Stream Data!"); }
     }
 
     function updateQuote() { const idx = Math.floor(Math.random() * quotesList.length); document.getElementById('quoteText').innerText = `"${quotesList[idx]}"`; }
@@ -538,8 +576,9 @@
         document.getElementById(progressId).style.background = `conic-gradient(#06d6a0 ${percent}%, #edf2f4 ${percent}%)`;
         document.getElementById(statsId).innerText = `${totalHours}h / ${totalDays * 8}h`;
       } else {
+        // ASSIGNED GOLDEN ACCENT GRADIENT FOR HABIT MATRIX OVERLAYS
         document.getElementById(progressId).innerText = percent + '%';
-        document.getElementById(progressId).style.background = `conic-gradient(#06d6a0 ${percent}%, #edf2f4 ${percent}%)`;
+        document.getElementById(progressId).style.background = `conic-gradient(var(--habit-circle-color) ${percent}%, #151f32 ${percent}%)`;
         document.getElementById(statsId).innerText = `${checked} / ${checkboxes.length}`;
       }
     }
@@ -593,7 +632,6 @@
       if (currentActiveTab === 'study') buildStudyCurveChart();
     }
 
-    // FIXED: Added 'Workout' back into the Chart.js labels list array
     function buildHabitChart() {
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
       let medCount = 0; let workCount = 0;
@@ -603,7 +641,7 @@
       }
       const ctx = document.getElementById('habitChart'); if (!ctx) return;
       if (habitChartInstance) habitChartInstance.destroy();
-      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation', 'Workout'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#06d6a0', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
+      habitChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Meditation', 'Workout'], datasets: [{ data: [medCount, workCount], backgroundColor: ['#ffb703', '#38bdf8'], borderRadius: 6, barThickness: 35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: daysInMonth, ticks: { stepSize: 5, color: '#64748b' } } } } });
     }
 
     function buildStudyCurveChart() {
