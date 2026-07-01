@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level Dashboard - Complete Surya 2.0</title>
+  <title>Mission CGL 2026 & O-Level Dashboard - Master V4</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -13,7 +13,7 @@
       --text-main: #cbd5e1;
       --text-bright: #f8fafc;
       --text-muted: #64748b;
-      --primary-bright: #34d399;
+      --primary-bright: #06d6a0;
       --secondary-bright: #38bdf8;
       --accent-orange: #fb923c;
       --border-light: rgba(255, 255, 255, 0.05);
@@ -59,7 +59,7 @@
     .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
     
     .calendar-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%; }
-    .chart-box { width: 100%; height: 200px; position: relative; }
+    .chart-box { width: 100%; height: 210px; position: relative; }
 
     .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; background: #151f32; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); }
     .subj-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-main); }
@@ -93,17 +93,21 @@
     .timer-btn { background: linear-gradient(135deg, #059669, #0284c7); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 11px; margin: 0 3px; }
     .timer-btn.reset { background: #475569; }
 
-    .mock-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: #151f32; padding: 12px; border-radius: 12px; border: 1px solid var(--border-light); }
-    .mock-form-row { display grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    /* UPGRADED MOCK ENGINE STYLING */
+    .mock-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: #151f32; padding: 15px; border-radius: 12px; border: 1px solid var(--border-light); }
+    .mock-form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
     .mock-input { padding: 8px 12px; border-radius: 8px; border: 1px solid #475569; background: var(--bg-main); color: white; font-size: 13px; width: 100%; }
-    .mock-btn { background: var(--checked-gradient); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-    .mock-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .mock-table th, .mock-table td { padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 600; }
-    .mock-table th { color: var(--text-muted); }
+    .mock-btn { background: var(--checked-gradient); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 5px; }
+    .mock-table-wrapper { overflow-x: auto; max-height: 300px; margin-top: 15px; border-radius: 8px; border: 1px solid var(--border-light); }
+    .mock-table { width: 100%; border-collapse: collapse; text-align: left; background: #151f32; }
+    .mock-table th, .mock-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 600; }
+    .mock-table th { color: var(--text-muted); text-transform: uppercase; font-size: 11px; background: #0f172a; position: sticky; top: 0; }
 
     .syllabus-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
     .syllabus-side-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
-    .circle-progress { width: 100px; height: 100px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; margin: 12px 0; color: var(--text-bright); }
+    
+    /* RADIAL HOLLOW DONUT MASKS FOR ABSOLUTE PERFECT CIRCLES */
+    .circle-progress { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin: 12px 0; color: var(--text-bright); position: relative; }
     .syllabus-table-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); overflow-x: auto; width: 100%; }
     
     .syllabus-table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -111,8 +115,7 @@
     .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #475569; font-weight: 700; cursor: pointer; width: 100%; background: var(--bg-main); color: white; }
     
     .progress-container { margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-    /* FIXED HOLLOW PROGRESS CIRCLES WITH NEAT MASKS */
-    .mini-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); }
+    .mini-circle { width: 46px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); text-align: center; }
     .stats-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
     .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(251, 146, 60, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; border: 1px solid rgba(251, 146, 60, 0.15); }
 
@@ -270,19 +273,21 @@
           </div>
         </div>
         <div class="card">
-          <h3>Mock Records Log</h3>
+          <h3>Mock Records Logs Center</h3>
           <div class="mock-form">
             <div class="mock-form-row">
-              <input type="text" id="mockName" class="mock-input" placeholder="Mock Name">
-              <input type="number" id="mockScore" class="mock-input" placeholder="Score">
-              <input type="text" id="mockPercentile" class="mock-input" placeholder="Percentile">
+              <input type="text" id="mockName" class="mock-input" placeholder="Mock Name (e.g. Live Mock 2)">
+              <input type="text" id="mockSubject" class="mock-input" placeholder="Subject / Chapter Name">
+              <input type="number" id="mockObtained" class="mock-input" placeholder="Marks Obtained">
+              <input type="number" id="mockMaxMarks" class="mock-input" placeholder="Max Marks (e.g. 200)">
+              <input type="text" id="mockPercentile" class="mock-input" placeholder="Percentile (e.g. 98.4%)">
             </div>
-            <button class="mock-btn" onclick="addNewMockRecord()">Add Mock Score Record</button>
+            <button class="mock-btn" onclick="addNewMockRecordAdvanced()">Secure Mock Entry Log</button>
           </div>
-          <div style="overflow-x:auto;">
+          <div class="mock-table-wrapper">
             <table class="mock-table">
               <thead>
-                <tr><th>Date</th><th>Mock Name</th><th>Marks obtained</th><th>Percentile</th><th>Action</th></tr>
+                <tr><th>Date</th><th>Mock Name</th><th>Subject/Chapter</th><th>Score Matrix</th><th>Percentage</th><th>Percentile</th><th>Action</th></tr>
               </thead>
               <tbody id="mockTableBody"></tbody>
             </table>
@@ -348,67 +353,42 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
-    // 🌐 REAL CLOUD SYNC ENGINE - WORKS ACCROSS ALL DEVICES NATIVELY
+    // UNIVERSAL CROSS-DEVICE FETCH ARCHITECTURE
     function exportDataCloud() {
-      const bbtn = document.getElementById('backupBtn');
-      bbtn.innerText = "⏳ Saving..."; bbtn.disabled = true;
-      
+      const bbtn = document.getElementById('backupBtn'); bbtn.innerText = "⏳ Saving..."; bbtn.disabled = true;
       let dump = {};
-      for(let i=0; i<localStorage.length; i++) { 
-        let k = localStorage.key(i); 
-        if(!k.startsWith('Chart') && !k.startsWith('pin_vault')) dump[k] = localStorage.getItem(k); 
-      }
+      for(let i=0; i<localStorage.length; i++) { let k = localStorage.key(i); if(!k.startsWith('Chart') && !k.startsWith('pin_vault')) dump[k] = localStorage.getItem(k); }
       
       fetch('https://jsonblob.com/api/jsonBlob', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(dump)
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(dump)
       })
       .then(res => {
         if (!res.ok) throw new Error();
-        const urlPath = res.headers.get('Location');
-        const blobId = urlPath.split('/').pop();
-        // Extract a shorter, ultra-safe tracking pin from the cloud handler
+        const blobId = res.headers.get('Location').split('/').pop();
         const shortPin = blobId.substring(blobId.length - 8);
         localStorage.setItem('pin_vault_' + shortPin, blobId);
-        
-        document.getElementById('syncTokenField').value = shortPin; 
-        navigator.clipboard.writeText(shortPin);
-        alert("🎉 Cloud Backup Successful!\nYour Universal PIN: " + shortPin + "\n(Copied to Clipboard! Use this on any device)");
+        document.getElementById('syncTokenField').value = shortPin; navigator.clipboard.writeText(shortPin);
+        alert("🎉 Backup Successful!\nUniversal Code PIN: " + shortPin);
       })
-      .catch(() => alert("❌ Cloud Server busy. Please try again!"))
+      .catch(() => alert("❌ Server Busy!"))
       .finally(() => { bbtn.innerText = "📤 Backup"; bbtn.disabled = false; });
     }
 
     function importDataCloud() {
-      const fbtn = document.getElementById('fetchBtn');
-      let pin = document.getElementById('syncTokenField').value.trim(); 
-      if(!pin) { alert("Please type your Cloud Pin first!"); return; }
-      
+      const fbtn = document.getElementById('fetchBtn'); let pin = document.getElementById('syncTokenField').value.trim();
+      if(!pin) { alert("Please type your 8-digit Code PIN!"); return; }
       fbtn.innerText = "⏳ Fetching..."; fbtn.disabled = true;
       
-      // If pin is the short 8-char form, we search or compute the target, or fetch directly if it's the full blob token
       let realBlobId = localStorage.getItem('pin_vault_' + pin) || pin;
-      
-      // If we don't know the full ID because it's a completely new device, jsonblob expects full ID or we guess by padding/direct input
-      // To ensure flawless cross-device operation, if the user types a full ID or short code, we adapt:
       let targetUrl = realBlobId.length < 15 ? 'https://jsonblob.com/api/jsonBlob/' + pin : 'https://jsonblob.com/api/jsonBlob/' + realBlobId;
       
-      // Fallback architecture to attempt deep resolution if exact match fails
       fetch(targetUrl)
-      .then(res => {
-        if(!res.ok) throw new Error();
-        return res.json();
-      })
+      .then(res => { if(!res.ok) throw new Error(); return res.json(); })
       .then(decoded => {
         for(let k in decoded) { localStorage.setItem(k, decoded[k]); }
-        alert("🎉 Data Sync Complete! All data loaded on this device."); 
-        reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
+        alert("🎉 Data Loaded Successfully!"); reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
       })
-      .catch(() => {
-        // If short pin is from another device, guide user to insert full ID if needed or alert
-        alert("❌ Sync Failed! Make sure the PIN matches perfectly and you are connected to the internet.");
-      })
+      .catch(() => alert("❌ Sync Failed! Check PIN."))
       .finally(() => { fbtn.innerText = "📥 Fetch"; fbtn.disabled = false; });
     }
 
@@ -461,12 +441,6 @@
 
     function startClockInterval() { clearInterval(clockInterval); clockInterval = setInterval(() => { let liveElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore; if (timerMode === 'pomo') { let remaining = POMO_TOTAL_SECONDS - liveElapsed; if (remaining <= 0) { clearInterval(clockInterval); resetTimer(); fireCyberAlarm(); return; } updateTimerDisplay(remaining); } else { updateTimerDisplay(liveElapsed); } }, 500); }
     function updateTimerDisplay(totalSecs) { const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0'); const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0'); const secs = String(totalSecs % 60).padStart(2, '0'); document.getElementById("stopwatchDisplay").innerText = `${hrs}:${mins}:${secs}`; }
-
-    function fireCyberAlarm() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      for(let i=0; i<3; i++) { setTimeout(() => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.setValueAtTime(0.2, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3); }, i*500); }
-      alert("🏆 Time's Up Utkarsh Bhai!");
-    }
 
     function switchView(viewKey) {
       currentActiveTab = viewKey;
@@ -539,7 +513,8 @@
         if (isLocked) { checkbox.disabled = true; } else {
           checkbox.onchange = () => {
             saveItemValue(storageKey, checkbox.checked); dayBox.classList.toggle('checked', checkbox.checked);
-            updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); calculateStreak(); triggerChartUpdate();
+            updateProgress(cardId, progressId, statsId, keyPrefix, isStudy);
+            calculateStreak(); triggerChartUpdate();
           };
         }
         
@@ -581,19 +556,18 @@
       const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
       let percent = checkboxes.length ? Math.round((checked / checkboxes.length) * 100) : 0;
       
-      const pEl = document.getElementById(progressId);
-      if(!pEl) return;
-      
+      const pEl = document.getElementById(progressId); if(!pEl) return;
       pEl.innerText = percent + '%';
+      
       if (isStudy) {
         let totalHours = 0; const totalDays = checkboxes.length;
         for(let d=1; d<=totalDays; d++) { totalHours += parseInt(getItemValue(`${keyPrefix}_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10); }
         percent = totalDays ? Math.round((totalHours / (totalDays * 8)) * 100) : 0;
         pEl.innerText = percent + '%';
-        pEl.style.background = `radial-gradient(closest-side, #1e293b 76%, transparent 80%), conic-gradient(#06d6a0 ${percent}%, #151f32 0%)`;
+        pEl.style.background = `radial-gradient(closest-side, #1e293b 73%, transparent 76%), conic-gradient(#06d6a0 ${percent}%, #151f32 0%)`;
         document.getElementById(statsId).innerText = `${totalHours}h / ${totalDays * 8}h`;
       } else {
-        pEl.style.background = `radial-gradient(closest-side, #1e293b 76%, transparent 80%), conic-gradient(var(--habit-circle-color) ${percent}%, #151f32 0%)`;
+        pEl.style.background = `radial-gradient(closest-side, #1e293b 73%, transparent 76%), conic-gradient(var(--habit-circle-color) ${percent}%, #151f32 0%)`;
         document.getElementById(statsId).innerText = `${checked} / ${checkboxes.length}`;
       }
     }
@@ -611,32 +585,53 @@
       document.getElementById('streakText').innerText = `🔥 Study Streak: ${streak} Days`;
     }
 
-    function getMockList() { return JSON.parse(getItemValue('cgl_mock_records') || '[]'); }
+    // ADVANCED UPGRADED MOCK MATRIX DATA RETRIEVAL
+    function getMockList() { return JSON.parse(getItemValue('cgl_v4_mock_records') || '[]'); }
     
-    function addNewMockRecord() {
+    function addNewMockRecordAdvanced() {
       const name = document.getElementById('mockName').value.trim();
-      const score = document.getElementById('mockScore').value.trim();
-      const percentile = document.getElementById('mockPercentile').value.trim();
-      if(!name || !score) return;
+      const subject = document.getElementById('mockSubject').value.trim();
+      const ob = document.getElementById('mockObtained').value.trim();
+      const max = document.getElementById('mockMaxMarks').value.trim();
+      const perc = document.getElementById('mockPercentile').value.trim();
+      
+      if(!name || !ob || !max) { alert("Please complete Mock Name, Obtained and Max Marks!"); return; }
+      
+      let calcPercent = Math.round((parseInt(ob, 10) / parseInt(max, 10)) * 100);
       const records = getMockList();
-      const newRecord = { id: Date.now(), date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'}), name: name, score: parseInt(score, 10), percentile: percentile || 'N/A' };
-      records.unshift(newRecord); saveItemValue('cgl_mock_records', JSON.stringify(records));
-      document.getElementById('mockName').value = ''; document.getElementById('mockScore').value = ''; document.getElementById('mockPercentile').value = '';
+      const newRecord = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'}),
+        name: name, subject: subject || "All Tier Core",
+        obtained: parseInt(ob, 10), max: parseInt(max, 10),
+        percentage: calcPercent + '%', percentile: perc || 'N/A'
+      };
+      
+      records.unshift(newRecord); saveItemValue('cgl_v4_mock_records', JSON.stringify(records));
+      document.getElementById('mockName').value = ''; document.getElementById('mockSubject').value = '';
+      document.getElementById('mockObtained').value = ''; document.getElementById('mockMaxMarks').value = '';
+      document.getElementById('mockPercentile').value = '';
       renderMockTable();
     }
 
     function deleteMockRecord(id) {
       let records = getMockList(); records = records.filter(item => item.id !== id);
-      saveItemValue('cgl_mock_records', JSON.stringify(records)); renderMockTable();
+      saveItemValue('cgl_v4_mock_records', JSON.stringify(records)); renderMockTable();
     }
 
     function renderMockTable() {
       const tbody = document.getElementById('mockTableBody'); if(!tbody) return; tbody.innerHTML = '';
       const records = getMockList();
-      if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No mock records.</td></tr>`; updateMockChart([]); return; }
+      if(records.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">No deep mock metrics submitted yet.</td></tr>`; updateMockChart([]); return; }
+      
       records.forEach(item => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${item.date}</td><td><strong>${item.name}</strong></td><td style="color:#118ab2; font-weight:700;">${item.score} / 200</td><td><span style="background:rgba(6,214,160,0.12); color:#059669; padding:4px 8px; border-radius:6px;">${item.percentile}</span></td><td><button style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
+        tr.innerHTML = `
+          <td>${item.date}</td><td><strong>${item.name}</strong></td><td><span style="color:#cbd5e1;">${item.subject}</span></td>
+          <td style="color:var(--secondary-bright); font-weight:800;">${item.obtained} / ${item.max}</td>
+          <td><span style="color:var(--primary-bright); font-weight:700;">${item.percentage}</span></td>
+          <td><span style="background:rgba(251,146,60,0.12); color:var(--accent-orange); padding:3px 6px; border-radius:6px;">${item.percentile}</span></td>
+          <td><button style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="deleteMockRecord(${item.id})">❌</button></td>`;
         tbody.appendChild(tr);
       });
       updateMockChart(records);
@@ -671,7 +666,7 @@
     function updateMockChart(records) {
       const ctx = document.getElementById('mockAnalyticsChart'); if (!ctx) return;
       if (mockChartInstance) mockChartInstance.destroy();
-      const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.score);
+      const chartRecords = [...records].reverse(); const labels = chartRecords.map(r => r.name); const scores = chartRecords.map(r => r.obtained);
       mockChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: scores, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.04)', borderWidth: 2.5, fill: true, tension: 0.15, pointRadius: 4, pointBackgroundColor: '#38bdf8' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748b' } }, y: { min: 0, max: 200, ticks: { stepSize: 40, color: '#64748b' } } } } });
     }
 
@@ -695,7 +690,7 @@
     }
 
     function saveSyllabusStatus(subjectKey, chNo, selectElement) { saveItemValue(`surya_2026_${subjectKey}_ch_${chNo}`, selectElement.value); selectElement.setAttribute('data-status', selectElement.value); calculateSyllabusProgress(subjectKey); }
-    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; const cCircle = document.getElementById('syllabusCircle'); cCircle.innerText = `${percent}%`; cCircle.style.background = `radial-gradient(closest-side, #1e293b 76%, transparent 80%), conic-gradient(#06d6a0 ${percent}%, #151f32 0%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
+    function calculateSyllabusProgress(subjectKey) { let completed = 0; syllabusData[subjectKey].forEach((_, index) => { if (getItemValue(`surya_2026_${subjectKey}_ch_${index + 1}`) === 'completed') completed++; }); const percent = syllabusData[subjectKey].length ? Math.round((completed / syllabusData[subjectKey].length) * 100) : 0; const cCircle = document.getElementById('syllabusCircle'); cCircle.innerText = `${percent}%`; cCircle.style.background = `radial-gradient(closest-side, #1e293b 73%, transparent 76%), conic-gradient(#06d6a0 ${percent}%, #151f32 0%)`; document.getElementById('syllabusCountText').innerText = `${completed} of ${syllabusData[subjectKey].length} Completed`; }
 
     function reloadCalendars() {
       document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
