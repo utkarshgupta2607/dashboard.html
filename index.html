@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level Dashboard - Master V4</title>
+  <title>Mission CGL 2026 & O-Level Dashboard - Master V5</title>
+  <!-- Load Chart.js for ultimate data visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -64,6 +65,14 @@
     .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; background: #151f32; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); }
     .subj-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-main); }
     
+    /* SCRATCHPAD TASK ROW LAYOUT */
+    .scratchpad-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+    .scratch-item { display: flex; align-items: center; gap: 12px; background: #151f32; padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border-light); }
+    .scratch-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-bright); cursor: pointer; }
+    .scratch-input { flex: 1; background: transparent; border: none; border-bottom: 1px dashed #475569; color: var(--text-bright); font-size: 14px; font-weight: 600; padding: 4px; outline: none; }
+    .scratch-input:focus { border-bottom-color: var(--secondary-bright); }
+    .scratch-item.done input[type="text"] { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; }
+
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
     .weekday-header { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; }
     
@@ -93,7 +102,6 @@
     .timer-btn { background: linear-gradient(135deg, #059669, #0284c7); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 11px; margin: 0 3px; }
     .timer-btn.reset { background: #475569; }
 
-    /* UPGRADED MOCK ENGINE STYLING */
     .mock-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: #151f32; padding: 15px; border-radius: 12px; border: 1px solid var(--border-light); }
     .mock-form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
     .mock-input { padding: 8px 12px; border-radius: 8px; border: 1px solid #475569; background: var(--bg-main); color: white; font-size: 13px; width: 100%; }
@@ -106,7 +114,6 @@
     .syllabus-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
     .syllabus-side-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
     
-    /* RADIAL HOLLOW DONUT MASKS FOR ABSOLUTE PERFECT CIRCLES */
     .circle-progress { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin: 12px 0; color: var(--text-bright); position: relative; }
     .syllabus-table-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); overflow-x: auto; width: 100%; }
     
@@ -115,7 +122,7 @@
     .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #475569; font-weight: 700; cursor: pointer; width: 100%; background: var(--bg-main); color: white; }
     
     .progress-container { margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .mini-circle { width: 46px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); text-align: center; }
+    .mini-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); text-align: center; }
     .stats-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
     .streak-display { font-size: 12px; font-weight: 800; color: var(--accent-orange); background: rgba(251, 146, 60, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; border: 1px solid rgba(251, 146, 60, 0.15); }
 
@@ -159,6 +166,8 @@
     <div class="sidebar-section-title">Daily Tracking</div>
     <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
     <div class="task" id="tab-study" onclick="switchView('study')">Study Architecture</div>
+    <!-- ADDED: Daily Scratchpad View Router -->
+    <div class="task" id="tab-scratchpad" onclick="switchView('scratchpad')">📝 Daily Scratchpad</div>
     <div class="task" id="tab-mocks" onclick="switchView('mocks')">📈 Mock Analytics</div>
     
     <div class="sidebar-section-title">Surya 2.0 Batch Syllabus</div>
@@ -265,10 +274,51 @@
         </div>
       </div>
 
+      <!-- NEW CARD: 8 INDEPENDENT CUSTOM INPUT FIELDS AND TICK DESK GRID -->
+      <div class="cards-grid" id="view-scratchpad" style="display:none;">
+        <div class="card">
+          <h3>📋 Daily Scratchpad (8 Target Milestones)</h3>
+          <div class="scratchpad-list">
+            <div class="scratch-item" id="item-task1">
+              <input type="checkbox" id="chk-task1" onchange="toggleScratchRow('task1')">
+              <input type="text" id="input-task1" class="scratch-input" placeholder="Task Target #01..." oninput="saveScratchText('task1')">
+            </div>
+            <div class="scratch-item" id="item-task2">
+              <input type="checkbox" id="chk-task2" onchange="toggleScratchRow('task2')">
+              <input type="text" id="input-task2" class="scratch-input" placeholder="Task Target #02..." oninput="saveScratchText('task2')">
+            </div>
+            <div class="scratch-item" id="item-task3">
+              <input type="checkbox" id="chk-task3" onchange="toggleScratchRow('task3')">
+              <input type="text" id="input-task3" class="scratch-input" placeholder="Task Target #03..." oninput="saveScratchText('task3')">
+            </div>
+            <div class="scratch-item" id="item-task4">
+              <input type="checkbox" id="chk-task4" onchange="toggleScratchRow('task4')">
+              <input type="text" id="input-task4" class="scratch-input" placeholder="Task Target #04..." oninput="saveScratchText('task4')">
+            </div>
+            <div class="scratch-item" id="item-task5">
+              <input type="checkbox" id="chk-task5" onchange="toggleScratchRow('task5')">
+              <input type="text" id="input-task5" class="scratch-input" placeholder="Task Target #05..." oninput="saveScratchText('task5')">
+            </div>
+            <div class="scratch-item" id="item-task6">
+              <input type="checkbox" id="chk-task6" onchange="toggleScratchRow('task6')">
+              <input type="text" id="input-task6" class="scratch-input" placeholder="Task Target #06..." oninput="saveScratchText('task6')">
+            </div>
+            <div class="scratch-item" id="item-task7">
+              <input type="checkbox" id="chk-task7" onchange="toggleScratchRow('task7')">
+              <input type="text" id="input-task7" class="scratch-input" placeholder="Task Target #07..." oninput="saveScratchText('task7')">
+            </div>
+            <div class="scratch-item" id="item-task8">
+              <input type="checkbox" id="chk-task8" onchange="toggleScratchRow('task8')">
+              <input type="text" id="input-task8" class="scratch-input" placeholder="Task Target #08..." oninput="saveScratchText('task8')">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="cards-grid" id="view-mocks" style="display:none;">
         <div class="card">
           <h3>CGL Mock Test Progress Graph</h3>
-          <div class="chart-box" style="height: 220px;">
+          <div class="chart-box">
             <canvas id="mockAnalyticsChart"></canvas>
           </div>
         </div>
@@ -353,7 +403,7 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
-    // UNIVERSAL CROSS-DEVICE FETCH ARCHITECTURE
+    // UNIVERSAL CLOUD SYNC ENGINE
     function exportDataCloud() {
       const bbtn = document.getElementById('backupBtn'); bbtn.innerText = "⏳ Saving..."; bbtn.disabled = true;
       let dump = {};
@@ -386,10 +436,37 @@
       .then(res => { if(!res.ok) throw new Error(); return res.json(); })
       .then(decoded => {
         for(let k in decoded) { localStorage.setItem(k, decoded[k]); }
-        alert("🎉 Data Loaded Successfully!"); reloadCalendars(); calculateStreak(); refreshUI(); initStopwatch();
+        alert("🎉 Data Loaded Successfully!"); reloadCalendars(); calculateStreak(); loadScratchpadData(); refreshUI(); initStopwatch();
       })
-      .catch(() => alert("❌ Sync Failed! Check PIN."))
-      .finally(() => { fbtn.innerText = "📥 Fetch"; fbtn.disabled = false; });
+      .catch(() => alert("❌ Sync Failed! Check PIN."));
+    }
+
+    // 📋 LIVE SCRATCHPAD DYNAMIC LOGIC SYSTEM
+    function saveScratchText(key) {
+      const textVal = document.getElementById(`input-${key}`).value;
+      saveItemValue(`scratch_text_${key}`, textVal);
+    }
+    
+    function toggleScratchRow(key) {
+      const chk = document.getElementById(`chk-text-${key}`); // internal selector adapt
+      const isChecked = document.getElementById(`chk-${key}`).checked;
+      saveItemValue(`scratch_status_${key}`, isChecked);
+      document.getElementById(`item-${key}`).classList.toggle('done', isChecked);
+    }
+    
+    function loadScratchpadData() {
+      for(let i = 1; i <= 8; i++) {
+        const key = `task${i}`;
+        const inputEl = document.getElementById(`input-${key}`);
+        const chkEl = document.getElementById(`chk-${key}`);
+        
+        if(inputEl) inputEl.value = getItemValue(`scratch_text_${key}`) || '';
+        if(chkEl) {
+          const status = getItemValue(`scratch_status_${key}`) === 'true';
+          chkEl.checked = status;
+          document.getElementById(`item-${key}`).classList.toggle('done', status);
+        }
+      }
     }
 
     function updateQuote() { const idx = Math.floor(Math.random() * quotesList.length); document.getElementById('quoteText').innerText = `"${quotesList[idx]}"`; }
@@ -442,6 +519,12 @@
     function startClockInterval() { clearInterval(clockInterval); clockInterval = setInterval(() => { let liveElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore; if (timerMode === 'pomo') { let remaining = POMO_TOTAL_SECONDS - liveElapsed; if (remaining <= 0) { clearInterval(clockInterval); resetTimer(); fireCyberAlarm(); return; } updateTimerDisplay(remaining); } else { updateTimerDisplay(liveElapsed); } }, 500); }
     function updateTimerDisplay(totalSecs) { const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0'); const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0'); const secs = String(totalSecs % 60).padStart(2, '0'); document.getElementById("stopwatchDisplay").innerText = `${hrs}:${mins}:${secs}`; }
 
+    function fireCyberAlarm() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      for(let i=0; i<3; i++) { setTimeout(() => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.setValueAtTime(0.2, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3); }, i*500); }
+      alert("🏆 Time's Up Utkarsh Bhai!");
+    }
+
     function switchView(viewKey) {
       currentActiveTab = viewKey;
       document.querySelectorAll('.task').forEach(t => t.classList.remove('active'));
@@ -449,9 +532,10 @@
       
       document.getElementById('view-self').style.display = (viewKey === 'self') ? 'flex' : 'none';
       document.getElementById('view-study').style.display = (viewKey === 'study') ? 'flex' : 'none';
+      document.getElementById('view-scratchpad').style.display = (viewKey === 'scratchpad') ? 'flex' : 'none';
       document.getElementById('view-mocks').style.display = (viewKey === 'mocks') ? 'flex' : 'none';
       
-      document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study' && viewKey !== 'mocks') ? 'grid' : 'none';
+      document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study' && viewKey !== 'mocks' && viewKey !== 'scratchpad') ? 'grid' : 'none';
       document.getElementById('calControls').style.display = (viewKey === 'self' || viewKey === 'study') ? 'flex' : 'none';
       refreshUI();
     }
@@ -459,6 +543,7 @@
     function refreshUI() {
       if (currentActiveTab === 'self' || currentActiveTab === 'study') { reloadCalendars(); } 
       else if (currentActiveTab === 'mocks') { renderMockTable(); }
+      else if (currentActiveTab === 'scratchpad') { loadScratchpadData(); }
       else { renderSyllabusSheet(currentActiveTab); }
     }
 
@@ -572,20 +657,6 @@
       }
     }
 
-    function calculateStreak() {
-      let streak = 0; const today = new Date(); let checkDate = new Date(today);
-      while (true) {
-        const d = checkDate.getDate(); const m = checkDate.getMonth() + 1; const y = checkDate.getFullYear();
-        const studyKey = `study_${y}_${m}_${d}_hours`; const hours = parseInt(getItemValue(studyKey) || '0', 10);
-        if (hours > 0) { streak++; checkDate.setDate(checkDate.getDate() - 1); } else {
-          if (streak === 0 && checkDate.toDateString() === today.toDateString()) { checkDate.setDate(checkDate.getDate() - 1); continue; }
-          break;
-        }
-      }
-      document.getElementById('streakText').innerText = `🔥 Study Streak: ${streak} Days`;
-    }
-
-    // ADVANCED UPGRADED MOCK MATRIX DATA RETRIEVAL
     function getMockList() { return JSON.parse(getItemValue('cgl_v4_mock_records') || '[]'); }
     
     function addNewMockRecordAdvanced() {
@@ -600,17 +671,14 @@
       let calcPercent = Math.round((parseInt(ob, 10) / parseInt(max, 10)) * 100);
       const records = getMockList();
       const newRecord = {
-        id: Date.now(),
-        date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'}),
-        name: name, subject: subject || "All Tier Core",
-        obtained: parseInt(ob, 10), max: parseInt(max, 10),
+        id: Date.now(), date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'}),
+        name: name, subject: subject || "All Tier Core", obtained: parseInt(ob, 10), max: parseInt(max, 10),
         percentage: calcPercent + '%', percentile: perc || 'N/A'
       };
       
       records.unshift(newRecord); saveItemValue('cgl_v4_mock_records', JSON.stringify(records));
       document.getElementById('mockName').value = ''; document.getElementById('mockSubject').value = '';
-      document.getElementById('mockObtained').value = ''; document.getElementById('mockMaxMarks').value = '';
-      document.getElementById('mockPercentile').value = '';
+      document.getElementById('mockObtained').value = ''; document.getElementById('mockMaxMarks').value = ''; document.getElementById('mockPercentile').value = '';
       renderMockTable();
     }
 
@@ -703,7 +771,7 @@
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
-    startDigitalClock(); setupHeader(); initStopwatch(); reloadCalendars(); calculateStreak(); updateQuote(); refreshUI();
+    startDigitalClock(); setupHeader(); initStopwatch(); reloadCalendars(); calculateStreak(); loadScratchpadData(); refreshUI();
   </script>
 </body>
 </html>
