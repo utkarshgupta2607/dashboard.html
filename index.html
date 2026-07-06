@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level - Master V6.1</title>
+  <title>Mission CGL 2026 & O-Level - Final Stable V6.2</title>
+  <!-- Load Chart.js for ultimate data visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -60,7 +61,7 @@
     .card h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; color: var(--text-bright); display: flex; align-items: center; gap: 8px; }
     .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
     
-    /* DAILY SCRATCHPAD CARD COMPACT SETUP */
+    /* 📋 DAILY SCRATCHPAD LAYOUT MATRIX */
     .scratch-container { max-width: 650px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 10px 0; }
     .scratch-item { 
       display: flex; align-items: center; 
@@ -94,7 +95,7 @@
     .scratch-item.done { opacity: 0.5; background: rgba(0,0,0,0.1); }
     .scratch-item.done .scratch-input { text-decoration: line-through; color: var(--text-muted); }
 
-    /* DASHBOARD GRID MATRIX ELEMENTS */
+    /* DASHBOARD ELEMENT ENGINE MATRICES */
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
     .weekday-header { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; }
     .day { background: var(--day-bg); border: 1px solid var(--border-light); padding: 8px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: var(--text-main); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 75px; height: auto; }
@@ -112,7 +113,7 @@
     .counter-value { font-size: 10px; font-weight: 800; text-align: center; width: 16px; color: var(--text-bright); display: inline-block; line-height: 1; }
 
     .circle-progress { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin: 12px 0; color: var(--text-bright); position: relative; }
-    .mini-circle { width: 46px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); }
+    .mini-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); }
 
     .mock-table { width: 100%; border-collapse: collapse; text-align: left; background: #151f32; }
     .mock-table th, .mock-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 600; }
@@ -488,9 +489,9 @@
     }
 
     function renderMockTable() {
-      const tbody = document.getElementById('mockTableBody'); tbody.innerHTML = '';
+      const tbody = document.getElementById('mockTableBody'); if(!tbody) return; tbody.innerHTML = '';
       const recs = JSON.parse(getItemValue('cgl_v4_mock_records') || '[]');
-      recs.forEach(r => { tbody.innerHTML += `<tr><td>${r.date}</td><td>${r.name}</td><td>${r.subject}</td><td>${r.obtained}/${r.max}</td><td style="color:#06d6a0">${r.percentage}</td><td>${r.percentile}</td><td><button onclick="delMock(${r.id})" style="background:none; border:none; cursor:pointer;">❌</button></td></tr>`; });
+      recs.forEach(r => { tbody.innerHTML += `<tr><td>${r.date}</td><td><strong>${r.name}</strong></td><td>${r.subject}</td><td>${r.obtained}/${r.max}</td><td style="color:#34d399">${r.percentage}</td><td>${r.percentile}</td><td><button onclick="delMock(${r.id})" style="background:none; border:none; cursor:pointer;">❌</button></td></tr>`; });
       updateMockChart(recs);
     }
     function delMock(id) { let recs = JSON.parse(getItemValue('cgl_v4_mock_records') || '[]'); recs = recs.filter(r => r.id !== id); saveItemValue('cgl_v4_mock_records', JSON.stringify(recs)); renderMockTable(); }
@@ -516,30 +517,80 @@
     }
 
     function renderSyllabusSheet(sk) {
-      document.getElementById('syllabusSubjectTitle').innerText = sk.toUpperCase();
+      const titles = { 
+        math: "Advanced Maths", english: "English Grammar", reasoning: "Reasoning Matrix", science: "Science Module",
+        history: "History Chronicles", geography: "Geography Axis", polity: "Indian Polity", economics: "Indian Economics",
+        static_gk: "Static GK Chest", computer: "Computer Capsule", current_affairs: "Current Affairs", hindi: "Hindi Core",
+        olevel_m1: "O-Level M1: IT Tools & Network Basics", olevel_m2: "O-Level M2: Web Design & Publishing",
+        olevel_m3: "O-Level M3: Python Programming Language", olevel_m4: "O-Level M4: Internet of Things (IoT) Architecture"
+      };
+      document.getElementById('syllabusSubjectTitle').innerText = titles[sk] || "Syllabus";
       const tb = document.getElementById('syllabusTableBody'); tb.innerHTML = '';
       syllabusData[sk].forEach((c, i) => {
         let sKey = `surya_2026_${sk}_ch_${i+1}`; let curS = getItemValue(sKey) || 'not_started';
         tb.innerHTML += `<tr><td>#${i+1}</td><td>${c}</td><td><select class="status-select" data-status="${curS}" onchange="saveItemValue('${sKey}', this.value); refreshUI();"><option value="not_started" ${curS==='not_started'?'selected':''}>❌ Not Started</option><option value="completed" ${curS==='completed'?'selected':''}>✅ Completed</option></select></td></tr>`;
       });
-      let done = syllabusData[sk].filter((_,i)=>getItemValue(`surya_2026_${sk}_ch_${i+1}`)==='completed').length;
+      let done = syllabusData[sk].filter((_, i)=>getItemValue(`surya_2026_${sk}_ch_${i+1}`)==='completed').length;
       let p = Math.round((done/syllabusData[sk].length)*100);
       const sc = document.getElementById('syllabusCircle'); sc.innerText = p+'%';
       sc.style.background = `radial-gradient(closest-side, #1e293b 73%, transparent 76%), conic-gradient(#06d6a0 ${p}%, #151f32 0%)`;
       document.getElementById('syllabusCountText').innerText = `${done} of ${syllabusData[sk].length} Done`;
     }
 
+    function initStopwatch() {
+      timerMode = localStorage.getItem('tm_mode') || 'sw';
+      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
+      const activeLbl = document.getElementById(`mode-${timerMode}`); if(activeLbl) activeLbl.classList.add('active');
+      isTimerRunning = localStorage.getItem('sw_running') === 'true';
+      elapsedTimeBefore = parseInt(localStorage.getItem('sw_elapsed') || '0', 10);
+      startTime = parseInt(localStorage.getItem('sw_start_time') || '0', 10);
+      const btn = document.getElementById("startStopBtn");
+      if (isTimerRunning && startTime > 0) { btn.innerText = "Pause"; btn.style.background = "#475569"; startClockInterval(); } 
+      else { updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore)); }
+    }
+
+    function switchTimerMode(mode) {
+      if(isTimerRunning) { alert("Pause first!"); return; }
+      timerMode = mode; localStorage.setItem('tm_mode', mode);
+      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
+      document.getElementById(`mode-${mode}`).classList.add('active');
+      elapsedTimeBefore = 0; startTime = 0; localStorage.setItem('sw_elapsed', '0');
+      updateTimerDisplay(mode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById("startStopBtn");
+      if (isTimerRunning) {
+        let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
+        isTimerRunning = false; elapsedTimeBefore = currentElapsed;
+        localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
+        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #059669, #0284c7)";
+        updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore));
+      } else {
+        isTimerRunning = true; startTime = Date.now();
+        localStorage.setItem('sw_running', 'true'); localStorage.setItem('sw_start_time', startTime.toString()); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
+        btn.innerText = "Pause"; btn.style.background = "#475569"; startClockInterval();
+      }
+    }
+
+    function resetTimer() {
+      isTimerRunning = false; clearInterval(clockInterval); elapsedTimeBefore = 0; startTime = 0;
+      localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', '0'); localStorage.setItem('sw_start_time', '0');
+      document.getElementById("startStopBtn").innerText = "Start"; document.getElementById("startStopBtn").style.background = "linear-gradient(135deg, #059669, #0284c7)"; 
+      updateTimerDisplay(timerMode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
+    }
+
     function prevMonth() { currentMonth--; if(currentMonth<1){currentMonth=12; currentYear--;} reloadCalendars(); }
     function nextMonth() { currentMonth++; if(currentMonth>12){currentMonth=1; currentYear++;} reloadCalendars(); }
     function reloadCalendars() { 
-      document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth-1).toLocaleString('default',{month:'long', year:'numeric'});
+      const mTitle = document.getElementById('monthTitle'); if(mTitle) mTitle.innerText = new Date(currentYear, currentMonth-1).toLocaleString('default',{month:'long', year:'numeric'});
       generateCalendar('meditationCalendar','meditationProgress','meditationStats','meditation');
       generateCalendar('workoutCalendar','workoutProgress','workoutStats','workout');
       generateCalendar('studyCalendar','studyProgress','studyStats','study',true);
       triggerChartUpdate();
     }
 
-    startDigitalClock(); setupHeader(); reloadCalendars(); loadScratchpadData(); switchView('self');
+    startDigitalClock(); setupHeader(); reloadCalendars(); loadScratchpadData(); switchView('self'); initStopwatch();
   </script>
 </body>
 </html>
