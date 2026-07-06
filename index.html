@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level Dashboard - Master V5.1</title>
-  <!-- Load Chart.js for ultimate data visualization -->
+  <title>Mission CGL 2026 & O-Level Dashboard - Master V5.2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -27,7 +26,13 @@
     body { margin: 0; display: flex; height: 100vh; background: var(--bg-main); color: var(--text-main); width: 100%; overflow: hidden; }
     
     .sidebar { width: 280px; background: var(--sidebar-bg); padding: 20px; box-shadow: 4px 0 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--border-light); overflow-y: auto; }
-    .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
+    .sidebar h2 { margin-top: 0; margin-bottom: 12px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 10px; width: 100%; }
+    
+    /* NAVIGATIONAL BUTTONS FOR CONTROLLING PAGES */
+    .page-controller-box { display: flex; gap: 8px; width: 100%; margin-bottom: 15px; }
+    .page-ctrl-btn { flex: 1; background: #151f32; border: 1px solid var(--border-light); color: var(--text-bright); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .page-ctrl-btn:hover { background: var(--card-bg); border-color: var(--secondary-bright); }
+
     .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 15px 0 6px 5px; font-weight: 800; }
     
     .task { width: 100%; background: #151f32; padding: 10px 14px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.2s; }
@@ -65,12 +70,12 @@
     .subj-check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; background: #151f32; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); }
     .subj-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-main); }
     
-    /* SCRATCHPAD TASK ROW LAYOUT */
+    /* MODIFIED SCRATCHPAD LAYOUT - CHECKBOXES NOW ON THE RIGHT SIDE */
     .scratchpad-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-    .scratch-item { display: flex; align-items: center; gap: 12px; background: #151f32; padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border-light); }
-    .scratch-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-bright); cursor: pointer; }
+    .scratch-item { display: flex; align-items: center; gap: 15px; background: #151f32; padding: 12px 18px; border-radius: 12px; border: 1px solid var(--border-light); justify-content: space-between; }
     .scratch-input { flex: 1; background: transparent; border: none; border-bottom: 1px dashed #475569; color: var(--text-bright); font-size: 14px; font-weight: 600; padding: 4px; outline: none; }
     .scratch-input:focus { border-bottom-color: var(--secondary-bright); }
+    .scratch-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary-bright); cursor: pointer; order: 2; margin: 0; }
     .scratch-item.done input[type="text"] { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; }
 
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
@@ -153,6 +158,11 @@
   <div class="sidebar">
     <h2>DASHBOARD 2026</h2>
     
+    <div class="page-controller-box">
+      <button class="page-ctrl-btn" onclick="navigatePage(-1)">◀ Prev View</button>
+      <button class="page-ctrl-btn" onclick="navigatePage(1)">Next View ▶</button>
+    </div>
+
     <div class="timer-container">
       <div class="timer-mode-container">
         <span id="mode-sw" class="mode-lbl active" onclick="switchTimerMode('sw')">Stopwatch</span>
@@ -163,7 +173,6 @@
       <button class="timer-btn reset" onclick="resetTimer()">Reset</button>
     </div>
 
-    <!-- FIXED SIDEBAR LABELS - ALL 4 OPTIONS NOW VISIBLE -->
     <div class="sidebar-section-title">Daily Tracking</div>
     <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
     <div class="task" id="tab-study" onclick="switchView('study')">Study Architecture</div>
@@ -274,42 +283,41 @@
         </div>
       </div>
 
-      <!-- DAILY SCRATCHPAD DESK VIEW -->
       <div class="cards-grid" id="view-scratchpad" style="display:none;">
         <div class="card">
           <h3>📋 Daily Scratchpad (8 Target Milestones)</h3>
           <div class="scratchpad-list">
             <div class="scratch-item" id="item-task1">
-              <input type="checkbox" id="chk-task1" onchange="toggleScratchRow('task1')">
               <input type="text" id="input-task1" class="scratch-input" placeholder="Task Target #01..." oninput="saveScratchText('task1')">
+              <input type="checkbox" id="chk-task1" onchange="toggleScratchRow('task1')">
             </div>
             <div class="scratch-item" id="item-task2">
-              <input type="checkbox" id="chk-task2" onchange="toggleScratchRow('task2')">
               <input type="text" id="input-task2" class="scratch-input" placeholder="Task Target #02..." oninput="saveScratchText('task2')">
+              <input type="checkbox" id="chk-task2" onchange="toggleScratchRow('task2')">
             </div>
             <div class="scratch-item" id="item-task3">
-              <input type="checkbox" id="chk-task3" onchange="toggleScratchRow('task3')">
               <input type="text" id="input-task3" class="scratch-input" placeholder="Task Target #03..." oninput="saveScratchText('task3')">
+              <input type="checkbox" id="chk-task3" onchange="toggleScratchRow('task3')">
             </div>
             <div class="scratch-item" id="item-task4">
-              <input type="checkbox" id="chk-task4" onchange="toggleScratchRow('task4')">
               <input type="text" id="input-task4" class="scratch-input" placeholder="Task Target #04..." oninput="saveScratchText('task4')">
+              <input type="checkbox" id="chk-task4" onchange="toggleScratchRow('task4')">
             </div>
             <div class="scratch-item" id="item-task5">
-              <input type="checkbox" id="chk-task5" onchange="toggleScratchRow('task5')">
               <input type="text" id="input-task5" class="scratch-input" placeholder="Task Target #05..." oninput="saveScratchText('task5')">
+              <input type="checkbox" id="chk-task5" onchange="toggleScratchRow('task5')">
             </div>
             <div class="scratch-item" id="item-task6">
-              <input type="checkbox" id="chk-task6" onchange="toggleScratchRow('task6')">
               <input type="text" id="input-task6" class="scratch-input" placeholder="Task Target #06..." oninput="saveScratchText('task6')">
+              <input type="checkbox" id="chk-task6" onchange="toggleScratchRow('task6')">
             </div>
             <div class="scratch-item" id="item-task7">
-              <input type="checkbox" id="chk-task7" onchange="toggleScratchRow('task7')">
               <input type="text" id="input-task7" class="scratch-input" placeholder="Task Target #07..." oninput="saveScratchText('task7')">
+              <input type="checkbox" id="chk-task7" onchange="toggleScratchRow('task7')">
             </div>
             <div class="scratch-item" id="item-task8">
-              <input type="checkbox" id="chk-task8" onchange="toggleScratchRow('task8')">
               <input type="text" id="input-task8" class="scratch-input" placeholder="Task Target #08..." oninput="saveScratchText('task8')">
+              <input type="checkbox" id="chk-task8" onchange="toggleScratchRow('task8')">
             </div>
           </div>
         </div>
@@ -368,6 +376,13 @@
     let currentYear = new Date().getFullYear(); 
     let currentActiveTab = 'self';
     
+    // Page sequencing list for controller routing
+    const pageKeysOrder = [
+      'self', 'study', 'scratchpad', 'mocks',
+      'math', 'english', 'reasoning', 'science', 'history', 'geography', 'polity', 'economics', 'static_gk', 'computer', 'current_affairs', 'hindi',
+      'olevel_m1', 'olevel_m2', 'olevel_m3', 'olevel_m4'
+    ];
+
     let isTimerRunning = false; let startTime = 0; let elapsedTimeBefore = 0; let clockInterval = null;
     let timerMode = 'sw'; const POMO_TOTAL_SECONDS = 3 * 60 * 60;
     
@@ -402,6 +417,14 @@
 
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
+
+    function navigatePage(direction) {
+      let idx = pageKeysOrder.indexOf(currentActiveTab);
+      idx += direction;
+      if (idx < 0) idx = pageKeysOrder.length - 1;
+      if (idx >= pageKeysOrder.length) idx = 0;
+      switchView(pageKeysOrder[idx]);
+    }
 
     function exportDataCloud() {
       const bbtn = document.getElementById('backupBtn'); bbtn.innerText = "⏳ Saving..."; bbtn.disabled = true;
@@ -536,6 +559,10 @@
       document.getElementById('view-syllabus').style.display = (viewKey !== 'self' && viewKey !== 'study' && viewKey !== 'mocks' && viewKey !== 'scratchpad') ? 'grid' : 'none';
       document.getElementById('calControls').style.display = (viewKey === 'self' || viewKey === 'study') ? 'flex' : 'none';
       refreshUI();
+      
+      // Auto-scroll inside sidebar to active button view for mobile accessibility
+      const targetBtn = document.getElementById(`tab-${viewKey}`);
+      if (targetBtn) { targetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     }
 
     function refreshUI() {
@@ -567,6 +594,18 @@
       const storageKey = `subj_${sub}_${currentYear}_${currentMonth}_${todayDay}`;
       const chk = document.getElementById(`chk-subj-${sub}`);
       saveItemValue(storageKey, chk.checked); calculateStreak();
+    }
+
+    function calculateStreak() {
+      let streak = 0; let today = new Date(); today.setHours(0,0,0,0);
+      while(true) {
+        let y = today.getFullYear(); let m = today.getMonth() + 1; let d = today.getDate();
+        let med = getItemValue(`meditation_${y}_${m}_${d}`) === 'true';
+        let wrk = getItemValue(`workout_${y}_${m}_${d}`) === 'true';
+        let hours = parseInt(getItemValue(`study_${y}_${m}_${d}_hours`) || '0', 10);
+        if(med || wrk || hours > 0) { streak++; today.setDate(today.getDate() - 1); } else { break; }
+      }
+      document.getElementById('streakText').innerText = `🔥 Study Streak: ${streak} Days`;
     }
 
     function generateCalendar(cardId, progressId, statsId, keyPrefix, isStudy = false) {
