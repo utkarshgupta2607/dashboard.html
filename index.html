@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level - Final Stable V6.2</title>
-  <!-- Load Chart.js for ultimate data visualization -->
+  <title>Mission CGL 2026 & O-Level - Master V6</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -26,10 +25,14 @@
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { margin: 0; display: flex; height: 100vh; background: var(--bg-main); color: var(--text-main); width: 100%; overflow: hidden; }
     
-    /* SIDEBAR LAYOUT */
+    /* SIDEBAR & NAVIGATION */
     .sidebar { width: 280px; background: var(--sidebar-bg); padding: 20px; box-shadow: 4px 0 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--border-light); overflow-y: auto; }
-    .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
+    .sidebar h2 { margin-top: 0; margin-bottom: 12px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 10px; width: 100%; }
     
+    .page-controller-box { display: flex; gap: 8px; width: 100%; margin-bottom: 15px; }
+    .page-ctrl-btn { flex: 1; background: #151f32; border: 1px solid var(--border-light); color: var(--text-bright); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+    .page-ctrl-btn:hover { background: var(--card-bg); border-color: var(--secondary-bright); }
+
     .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 15px 0 6px 5px; font-weight: 800; }
     
     .task { width: 100%; background: #151f32; padding: 10px 14px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.2s; }
@@ -61,7 +64,7 @@
     .card h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; color: var(--text-bright); display: flex; align-items: center; gap: 8px; }
     .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
     
-    /* 📋 DAILY SCRATCHPAD LAYOUT MATRIX */
+    /* 📋 PREMIUM DAILY SCRATCHPAD STYLING */
     .scratch-container { max-width: 650px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 10px 0; }
     .scratch-item { 
       display: flex; align-items: center; 
@@ -95,25 +98,19 @@
     .scratch-item.done { opacity: 0.5; background: rgba(0,0,0,0.1); }
     .scratch-item.done .scratch-input { text-decoration: line-through; color: var(--text-muted); }
 
-    /* DASHBOARD ELEMENT ENGINE MATRICES */
+    /* DASHBOARD ELEMENTS */
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
     .weekday-header { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; }
     .day { background: var(--day-bg); border: 1px solid var(--border-light); padding: 8px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: var(--text-main); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 75px; height: auto; }
     .day.checked { background: var(--checked-gradient); border-color: transparent; color: var(--text-bright); font-weight: 700; box-shadow: 0 4px 15px rgba(5, 149, 105, 0.3); }
     .day.today { border: 2px solid var(--secondary-bright); background: rgba(56, 189, 248, 0.05); color: var(--secondary-bright); font-weight: 800; }
     
-    .checkbox-container { display: inline-block; position: relative; width: 16px; height: 16px; margin-top: 4px; }
-    .calendar input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #475569; border-radius: 5px; cursor: pointer; background: rgba(0,0,0,0.2); margin: 0; }
-    .day.checked input[type="checkbox"] { border-color: #fff; background: #fff; }
-    .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: var(--primary-bright); font-size: 11px; font-weight: 900; }
-    .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
-
     .counter-container { display: flex; align-items: center; justify-content: space-between; gap: 2px; margin-top: auto; background: rgba(0,0,0,0.3); padding: 2px; border-radius: 6px; width: 100%; max-width: 52px; }
     .counter-btn { background: #475569; color: white; border: none; font-size: 9px; font-weight: 900; width: 15px; height: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .counter-value { font-size: 10px; font-weight: 800; text-align: center; width: 16px; color: var(--text-bright); display: inline-block; line-height: 1; }
 
     .circle-progress { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin: 12px 0; color: var(--text-bright); position: relative; }
-    .mini-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); }
+    .mini-circle { width: 46px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); color: var(--text-bright); }
 
     .mock-table { width: 100%; border-collapse: collapse; text-align: left; background: #151f32; }
     .mock-table th, .mock-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 600; }
@@ -132,6 +129,21 @@
 
   <div class="sidebar">
     <h2>DASHBOARD 2026</h2>
+    
+    <div class="page-controller-box">
+      <button class="page-ctrl-btn" onclick="navigatePage(-1)">◀ Prev View</button>
+      <button class="page-ctrl-btn" onclick="navigatePage(1)">Next View ▶</button>
+    </div>
+
+    <div class="timer-container" style="background:#1e293b; padding:15px; border-radius:14px; text-align:center; width:100%; margin-bottom:20px; border:1px solid var(--border-light);">
+      <div style="display:flex; justify-content:center; gap:6px; margin-bottom:8px;">
+        <span id="mode-sw" class="mode-lbl active" style="font-size:9px; font-weight:800; padding:2px 6px; cursor:pointer;" onclick="switchTimerMode('sw')">Stopwatch</span>
+        <span id="mode-pomo" class="mode-lbl" style="font-size:9px; font-weight:800; padding:2px 6px; cursor:pointer;" onclick="switchTimerMode('pomo')">3H Pomo</span>
+      </div>
+      <div id="stopwatchDisplay" style="font-size:24px; font-weight:900; color:#ef4444; font-family:monospace; margin-bottom:10px;">00:00:00</div>
+      <button id="startStopBtn" onclick="toggleTimer()" style="background:linear-gradient(135deg, #059669, #0284c7); color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:700; cursor:pointer; font-size:11px;">Start</button>
+      <button onclick="resetTimer()" style="background:#475569; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:700; cursor:pointer; font-size:11px;">Reset</button>
+    </div>
 
     <div class="sidebar-section-title">Daily Tracking</div>
     <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
@@ -317,6 +329,12 @@
     let currentMonth = new Date().getMonth() + 1; 
     let currentYear = new Date().getFullYear(); 
     let currentActiveTab = 'self';
+    
+    const pageKeysOrder = [
+      'self', 'study', 'scratchpad', 'mocks',
+      'math', 'english', 'reasoning', 'science', 'history', 'geography', 'polity', 'economics', 'static_gk', 'computer', 'current_affairs', 'hindi',
+      'olevel_m1', 'olevel_m2', 'olevel_m3', 'olevel_m4'
+    ];
 
     let isTimerRunning = false; let startTime = 0; let elapsedTimeBefore = 0; let clockInterval = null;
     let timerMode = 'sw'; const POMO_TOTAL_SECONDS = 3 * 60 * 60;
@@ -343,6 +361,14 @@
 
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
+
+    function navigatePage(direction) {
+      let idx = pageKeysOrder.indexOf(currentActiveTab);
+      idx += direction;
+      if (idx < 0) idx = pageKeysOrder.length - 1;
+      if (idx >= pageKeysOrder.length) idx = 0;
+      switchView(pageKeysOrder[idx]);
+    }
 
     function exportDataCloud() {
       const bbtn = document.getElementById('backupBtn'); bbtn.innerText = "⏳ Saving..."; bbtn.disabled = true;
@@ -375,6 +401,7 @@
       .finally(() => { fbtn.innerText = "📥 Fetch"; fbtn.disabled = false; });
     }
 
+    // 📋 SCRATCHPAD STORAGE ENGINE (FIXED)
     function saveScratchText(key) {
       const textVal = document.getElementById(`input-${key}`).value;
       saveItemValue(`scratch_text_${key}`, textVal);
@@ -441,9 +468,9 @@
         if (new Date().getDate() === day && (new Date().getMonth()+1) === currentMonth) db.classList.add('today');
         cb.onchange = () => { saveItemValue(sk, cb.checked); db.classList.toggle('checked', cb.checked); updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); calculateStreak(); triggerChartUpdate(); };
         if (isStudy) {
-          const hk = sk + '_hours'; let initialHours = parseInt(getItemValue(hk) || '0', 10);
+          const hk = sk + '_hours'; let curH = parseInt(getItemValue(hk) || '0', 10);
           const cd = document.createElement('div'); cd.className = 'counter-container';
-          cd.innerHTML = `<button class="counter-btn" onclick="hCh('${hk}',-1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">-</button><span class="counter-value">${initialHours}</span><button class="counter-btn" onclick="hCh('${hk}',1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">+</button>`;
+          cd.innerHTML = `<button class="counter-btn" onclick="hCh('${hk}',-1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">-</button><span class="counter-value">${curH}</span><button class="counter-btn" onclick="hCh('${hk}',1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">+</button>`;
           db.appendChild(cd);
         }
         label.appendChild(cb); db.appendChild(label); calendar.appendChild(db);
@@ -489,108 +516,46 @@
     }
 
     function renderMockTable() {
-      const tbody = document.getElementById('mockTableBody'); if(!tbody) return; tbody.innerHTML = '';
+      const tbody = document.getElementById('mockTableBody'); tbody.innerHTML = '';
       const recs = JSON.parse(getItemValue('cgl_v4_mock_records') || '[]');
-      recs.forEach(r => { tbody.innerHTML += `<tr><td>${r.date}</td><td><strong>${r.name}</strong></td><td>${r.subject}</td><td>${r.obtained}/${r.max}</td><td style="color:#34d399">${r.percentage}</td><td>${r.percentile}</td><td><button onclick="delMock(${r.id})" style="background:none; border:none; cursor:pointer;">❌</button></td></tr>`; });
+      recs.forEach(r => { tbody.innerHTML += `<tr><td>${r.date}</td><td>${r.name}</td><td>${r.subject}</td><td>${r.obtained}/${r.max}</td><td style="color:#06d6a0">${r.percentage}</td><td>${r.percentile}</td><td><button onclick="delMock(${r.id})" style="background:none; border:none; cursor:pointer;">❌</button></td></tr>`; });
       updateMockChart(recs);
     }
     function delMock(id) { let recs = JSON.parse(getItemValue('cgl_v4_mock_records') || '[]'); recs = recs.filter(r => r.id !== id); saveItemValue('cgl_v4_mock_records', JSON.stringify(recs)); renderMockTable(); }
 
     function triggerChartUpdate() {
-      const ctxH = document.getElementById('habitChart'); if (!ctxH) return;
+      const ctxH = document.getElementById('habitChart');
       let mc=0, wc=0, dm = new Date(currentYear, currentMonth, 0).getDate();
       for(let d=1; d<=dm; d++) { if(getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`)==='true') mc++; if(getItemValue(`workout_${currentYear}_${currentMonth}_${d}`)==='true') wc++; }
       if(habitChartInstance) habitChartInstance.destroy();
       habitChartInstance = new Chart(ctxH, { type:'bar', data:{ labels:['Meditation','Workout'], datasets:[{data:[mc,wc], backgroundColor:['#ffb703','#38bdf8'], borderRadius:6}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
     }
 
-    function calculateStreak() {
-      let streak = 0; let today = new Date(); today.setHours(0,0,0,0);
-      while(true) {
-        let y = today.getFullYear(); let m = today.getMonth() + 1; let d = today.getDate();
-        let med = getItemValue(`meditation_${y}_${m}_${d}`) === 'true';
-        let wrk = getItemValue(`workout_${y}_${m}_${d}`) === 'true';
-        let hours = parseInt(getItemValue(`study_${y}_${m}_${d}_hours`) || '0', 10);
-        if(med || wrk || hours > 0) { streak++; today.setDate(today.getDate() - 1); } else { break; }
-      }
-      document.getElementById('streakText').innerText = `🔥 Study Streak: ${streak} Days`;
-    }
-
     function renderSyllabusSheet(sk) {
-      const titles = { 
-        math: "Advanced Maths", english: "English Grammar", reasoning: "Reasoning Matrix", science: "Science Module",
-        history: "History Chronicles", geography: "Geography Axis", polity: "Indian Polity", economics: "Indian Economics",
-        static_gk: "Static GK Chest", computer: "Computer Capsule", current_affairs: "Current Affairs", hindi: "Hindi Core",
-        olevel_m1: "O-Level M1: IT Tools & Network Basics", olevel_m2: "O-Level M2: Web Design & Publishing",
-        olevel_m3: "O-Level M3: Python Programming Language", olevel_m4: "O-Level M4: Internet of Things (IoT) Architecture"
-      };
-      document.getElementById('syllabusSubjectTitle').innerText = titles[sk] || "Syllabus";
+      document.getElementById('syllabusSubjectTitle').innerText = sk.toUpperCase();
       const tb = document.getElementById('syllabusTableBody'); tb.innerHTML = '';
       syllabusData[sk].forEach((c, i) => {
         let sKey = `surya_2026_${sk}_ch_${i+1}`; let curS = getItemValue(sKey) || 'not_started';
         tb.innerHTML += `<tr><td>#${i+1}</td><td>${c}</td><td><select class="status-select" data-status="${curS}" onchange="saveItemValue('${sKey}', this.value); refreshUI();"><option value="not_started" ${curS==='not_started'?'selected':''}>❌ Not Started</option><option value="completed" ${curS==='completed'?'selected':''}>✅ Completed</option></select></td></tr>`;
       });
-      let done = syllabusData[sk].filter((_, i)=>getItemValue(`surya_2026_${sk}_ch_${i+1}`)==='completed').length;
+      let done = syllabusData[sk].filter((_,i)=>getItemValue(`surya_2026_${sk}_ch_${i+1}`)==='completed').length;
       let p = Math.round((done/syllabusData[sk].length)*100);
       const sc = document.getElementById('syllabusCircle'); sc.innerText = p+'%';
       sc.style.background = `radial-gradient(closest-side, #1e293b 73%, transparent 76%), conic-gradient(#06d6a0 ${p}%, #151f32 0%)`;
       document.getElementById('syllabusCountText').innerText = `${done} of ${syllabusData[sk].length} Done`;
     }
 
-    function initStopwatch() {
-      timerMode = localStorage.getItem('tm_mode') || 'sw';
-      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
-      const activeLbl = document.getElementById(`mode-${timerMode}`); if(activeLbl) activeLbl.classList.add('active');
-      isTimerRunning = localStorage.getItem('sw_running') === 'true';
-      elapsedTimeBefore = parseInt(localStorage.getItem('sw_elapsed') || '0', 10);
-      startTime = parseInt(localStorage.getItem('sw_start_time') || '0', 10);
-      const btn = document.getElementById("startStopBtn");
-      if (isTimerRunning && startTime > 0) { btn.innerText = "Pause"; btn.style.background = "#475569"; startClockInterval(); } 
-      else { updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore)); }
-    }
-
-    function switchTimerMode(mode) {
-      if(isTimerRunning) { alert("Pause first!"); return; }
-      timerMode = mode; localStorage.setItem('tm_mode', mode);
-      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
-      document.getElementById(`mode-${mode}`).classList.add('active');
-      elapsedTimeBefore = 0; startTime = 0; localStorage.setItem('sw_elapsed', '0');
-      updateTimerDisplay(mode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
-    }
-
-    function toggleTimer() {
-      const btn = document.getElementById("startStopBtn");
-      if (isTimerRunning) {
-        let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
-        isTimerRunning = false; elapsedTimeBefore = currentElapsed;
-        localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
-        clearInterval(clockInterval); btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #059669, #0284c7)";
-        updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore));
-      } else {
-        isTimerRunning = true; startTime = Date.now();
-        localStorage.setItem('sw_running', 'true'); localStorage.setItem('sw_start_time', startTime.toString()); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
-        btn.innerText = "Pause"; btn.style.background = "#475569"; startClockInterval();
-      }
-    }
-
-    function resetTimer() {
-      isTimerRunning = false; clearInterval(clockInterval); elapsedTimeBefore = 0; startTime = 0;
-      localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', '0'); localStorage.setItem('sw_start_time', '0');
-      document.getElementById("startStopBtn").innerText = "Start"; document.getElementById("startStopBtn").style.background = "linear-gradient(135deg, #059669, #0284c7)"; 
-      updateTimerDisplay(timerMode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
-    }
-
     function prevMonth() { currentMonth--; if(currentMonth<1){currentMonth=12; currentYear--;} reloadCalendars(); }
     function nextMonth() { currentMonth++; if(currentMonth>12){currentMonth=1; currentYear++;} reloadCalendars(); }
     function reloadCalendars() { 
-      const mTitle = document.getElementById('monthTitle'); if(mTitle) mTitle.innerText = new Date(currentYear, currentMonth-1).toLocaleString('default',{month:'long', year:'numeric'});
+      document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth-1).toLocaleString('default',{month:'long', year:'numeric'});
       generateCalendar('meditationCalendar','meditationProgress','meditationStats','meditation');
       generateCalendar('workoutCalendar','workoutProgress','workoutStats','workout');
       generateCalendar('studyCalendar','studyProgress','studyStats','study',true);
       triggerChartUpdate();
     }
 
-    startDigitalClock(); setupHeader(); reloadCalendars(); loadScratchpadData(); switchView('self'); initStopwatch();
+    startDigitalClock(); setupHeader(); reloadCalendars(); loadScratchpadData(); switchView('self');
   </script>
 </body>
 </html>
