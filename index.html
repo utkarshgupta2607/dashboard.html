@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level - Master V6</title>
+  <title>Mission CGL 2026 & O-Level - Master V6.1</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -25,14 +25,10 @@
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { margin: 0; display: flex; height: 100vh; background: var(--bg-main); color: var(--text-main); width: 100%; overflow: hidden; }
     
-    /* SIDEBAR & NAVIGATION */
+    /* SIDEBAR LAYOUT */
     .sidebar { width: 280px; background: var(--sidebar-bg); padding: 20px; box-shadow: 4px 0 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--border-light); overflow-y: auto; }
-    .sidebar h2 { margin-top: 0; margin-bottom: 12px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 10px; width: 100%; }
+    .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
     
-    .page-controller-box { display: flex; gap: 8px; width: 100%; margin-bottom: 15px; }
-    .page-ctrl-btn { flex: 1; background: #151f32; border: 1px solid var(--border-light); color: var(--text-bright); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-    .page-ctrl-btn:hover { background: var(--card-bg); border-color: var(--secondary-bright); }
-
     .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 15px 0 6px 5px; font-weight: 800; }
     
     .task { width: 100%; background: #151f32; padding: 10px 14px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.2s; }
@@ -64,7 +60,7 @@
     .card h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; color: var(--text-bright); display: flex; align-items: center; gap: 8px; }
     .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
     
-    /* 📋 PREMIUM DAILY SCRATCHPAD STYLING */
+    /* DAILY SCRATCHPAD CARD COMPACT SETUP */
     .scratch-container { max-width: 650px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 10px 0; }
     .scratch-item { 
       display: flex; align-items: center; 
@@ -98,13 +94,19 @@
     .scratch-item.done { opacity: 0.5; background: rgba(0,0,0,0.1); }
     .scratch-item.done .scratch-input { text-decoration: line-through; color: var(--text-muted); }
 
-    /* DASHBOARD ELEMENTS */
+    /* DASHBOARD GRID MATRIX ELEMENTS */
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
     .weekday-header { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; }
     .day { background: var(--day-bg); border: 1px solid var(--border-light); padding: 8px 4px; border-radius: 12px; text-align: center; font-size: 12px; color: var(--text-main); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 75px; height: auto; }
     .day.checked { background: var(--checked-gradient); border-color: transparent; color: var(--text-bright); font-weight: 700; box-shadow: 0 4px 15px rgba(5, 149, 105, 0.3); }
     .day.today { border: 2px solid var(--secondary-bright); background: rgba(56, 189, 248, 0.05); color: var(--secondary-bright); font-weight: 800; }
     
+    .checkbox-container { display: inline-block; position: relative; width: 16px; height: 16px; margin-top: 4px; }
+    .calendar input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #475569; border-radius: 5px; cursor: pointer; background: rgba(0,0,0,0.2); margin: 0; }
+    .day.checked input[type="checkbox"] { border-color: #fff; background: #fff; }
+    .checkbox-container::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: var(--primary-bright); font-size: 11px; font-weight: 900; }
+    .day.checked .checkbox-container::after { transform: translate(-50%, -50%) scale(1); }
+
     .counter-container { display: flex; align-items: center; justify-content: space-between; gap: 2px; margin-top: auto; background: rgba(0,0,0,0.3); padding: 2px; border-radius: 6px; width: 100%; max-width: 52px; }
     .counter-btn { background: #475569; color: white; border: none; font-size: 9px; font-weight: 900; width: 15px; height: 14px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .counter-value { font-size: 10px; font-weight: 800; text-align: center; width: 16px; color: var(--text-bright); display: inline-block; line-height: 1; }
@@ -129,21 +131,6 @@
 
   <div class="sidebar">
     <h2>DASHBOARD 2026</h2>
-    
-    <div class="page-controller-box">
-      <button class="page-ctrl-btn" onclick="navigatePage(-1)">◀ Prev View</button>
-      <button class="page-ctrl-btn" onclick="navigatePage(1)">Next View ▶</button>
-    </div>
-
-    <div class="timer-container" style="background:#1e293b; padding:15px; border-radius:14px; text-align:center; width:100%; margin-bottom:20px; border:1px solid var(--border-light);">
-      <div style="display:flex; justify-content:center; gap:6px; margin-bottom:8px;">
-        <span id="mode-sw" class="mode-lbl active" style="font-size:9px; font-weight:800; padding:2px 6px; cursor:pointer;" onclick="switchTimerMode('sw')">Stopwatch</span>
-        <span id="mode-pomo" class="mode-lbl" style="font-size:9px; font-weight:800; padding:2px 6px; cursor:pointer;" onclick="switchTimerMode('pomo')">3H Pomo</span>
-      </div>
-      <div id="stopwatchDisplay" style="font-size:24px; font-weight:900; color:#ef4444; font-family:monospace; margin-bottom:10px;">00:00:00</div>
-      <button id="startStopBtn" onclick="toggleTimer()" style="background:linear-gradient(135deg, #059669, #0284c7); color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:700; cursor:pointer; font-size:11px;">Start</button>
-      <button onclick="resetTimer()" style="background:#475569; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:700; cursor:pointer; font-size:11px;">Reset</button>
-    </div>
 
     <div class="sidebar-section-title">Daily Tracking</div>
     <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
@@ -329,12 +316,6 @@
     let currentMonth = new Date().getMonth() + 1; 
     let currentYear = new Date().getFullYear(); 
     let currentActiveTab = 'self';
-    
-    const pageKeysOrder = [
-      'self', 'study', 'scratchpad', 'mocks',
-      'math', 'english', 'reasoning', 'science', 'history', 'geography', 'polity', 'economics', 'static_gk', 'computer', 'current_affairs', 'hindi',
-      'olevel_m1', 'olevel_m2', 'olevel_m3', 'olevel_m4'
-    ];
 
     let isTimerRunning = false; let startTime = 0; let elapsedTimeBefore = 0; let clockInterval = null;
     let timerMode = 'sw'; const POMO_TOTAL_SECONDS = 3 * 60 * 60;
@@ -361,14 +342,6 @@
 
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
-
-    function navigatePage(direction) {
-      let idx = pageKeysOrder.indexOf(currentActiveTab);
-      idx += direction;
-      if (idx < 0) idx = pageKeysOrder.length - 1;
-      if (idx >= pageKeysOrder.length) idx = 0;
-      switchView(pageKeysOrder[idx]);
-    }
 
     function exportDataCloud() {
       const bbtn = document.getElementById('backupBtn'); bbtn.innerText = "⏳ Saving..."; bbtn.disabled = true;
@@ -401,7 +374,6 @@
       .finally(() => { fbtn.innerText = "📥 Fetch"; fbtn.disabled = false; });
     }
 
-    // 📋 SCRATCHPAD STORAGE ENGINE (FIXED)
     function saveScratchText(key) {
       const textVal = document.getElementById(`input-${key}`).value;
       saveItemValue(`scratch_text_${key}`, textVal);
@@ -468,9 +440,9 @@
         if (new Date().getDate() === day && (new Date().getMonth()+1) === currentMonth) db.classList.add('today');
         cb.onchange = () => { saveItemValue(sk, cb.checked); db.classList.toggle('checked', cb.checked); updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); calculateStreak(); triggerChartUpdate(); };
         if (isStudy) {
-          const hk = sk + '_hours'; let curH = parseInt(getItemValue(hk) || '0', 10);
+          const hk = sk + '_hours'; let initialHours = parseInt(getItemValue(hk) || '0', 10);
           const cd = document.createElement('div'); cd.className = 'counter-container';
-          cd.innerHTML = `<button class="counter-btn" onclick="hCh('${hk}',-1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">-</button><span class="counter-value">${curH}</span><button class="counter-btn" onclick="hCh('${hk}',1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">+</button>`;
+          cd.innerHTML = `<button class="counter-btn" onclick="hCh('${hk}',-1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">-</button><span class="counter-value">${initialHours}</span><button class="counter-btn" onclick="hCh('${hk}',1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}')">+</button>`;
           db.appendChild(cd);
         }
         label.appendChild(cb); db.appendChild(label); calendar.appendChild(db);
@@ -524,11 +496,23 @@
     function delMock(id) { let recs = JSON.parse(getItemValue('cgl_v4_mock_records') || '[]'); recs = recs.filter(r => r.id !== id); saveItemValue('cgl_v4_mock_records', JSON.stringify(recs)); renderMockTable(); }
 
     function triggerChartUpdate() {
-      const ctxH = document.getElementById('habitChart');
+      const ctxH = document.getElementById('habitChart'); if (!ctxH) return;
       let mc=0, wc=0, dm = new Date(currentYear, currentMonth, 0).getDate();
       for(let d=1; d<=dm; d++) { if(getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`)==='true') mc++; if(getItemValue(`workout_${currentYear}_${currentMonth}_${d}`)==='true') wc++; }
       if(habitChartInstance) habitChartInstance.destroy();
       habitChartInstance = new Chart(ctxH, { type:'bar', data:{ labels:['Meditation','Workout'], datasets:[{data:[mc,wc], backgroundColor:['#ffb703','#38bdf8'], borderRadius:6}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
+    }
+
+    function calculateStreak() {
+      let streak = 0; let today = new Date(); today.setHours(0,0,0,0);
+      while(true) {
+        let y = today.getFullYear(); let m = today.getMonth() + 1; let d = today.getDate();
+        let med = getItemValue(`meditation_${y}_${m}_${d}`) === 'true';
+        let wrk = getItemValue(`workout_${y}_${m}_${d}`) === 'true';
+        let hours = parseInt(getItemValue(`study_${y}_${m}_${d}_hours`) || '0', 10);
+        if(med || wrk || hours > 0) { streak++; today.setDate(today.getDate() - 1); } else { break; }
+      }
+      document.getElementById('streakText').innerText = `🔥 Study Streak: ${streak} Days`;
     }
 
     function renderSyllabusSheet(sk) {
