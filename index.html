@@ -304,4 +304,42 @@
       let percent = 0; const cbs = document.querySelectorAll(`#${cardId} input[type="checkbox"]`);
       const checked = Array.from(cbs).filter(c => c.checked).length;
       if (isStudy) {
-        let th = 0; for(let d=1; d<=cbs.length; d++) th += par
+        let th = 0; for(let d=1; d<=cbs.length; d++) th += parseInt(getItemValue(`${keyPrefix}_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10);
+        percent = cbs.length ? Math.round((th / (cbs.length * 8)) * 100) : 0;
+        pEl.style.background = `radial-gradient(closest-side, #1e293b 76%, transparent 80%), conic-gradient(#06d6a0 ${percent}%, #151f32 0%)`;
+        document.getElementById(statsId).innerText = `${th}h / ${cbs.length * 8}h`;
+      } else {
+        percent = cbs.length ? Math.round((checked / cbs.length) * 100) : 0;
+        pEl.style.background = `radial-gradient(closest-side, #1e293b 76%, transparent 80%), conic-gradient(#ffb703 ${percent}%, #151f32 0%)`;
+        document.getElementById(statsId).innerText = `${checked} / ${cbs.length}`;
+      }
+      pEl.innerText = percent + '%';
+    }
+
+    function triggerChartUpdate() {
+      const ctxH = document.getElementById('habitChart'); if(!ctxH) return;
+      let mc=0, wc=0, dm = new Date(currentYear, currentMonth, 0).getDate();
+      for(let d=1; d<=dm; d++) { if(getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`)==='true') mc++; if(getItemValue(`workout_${currentYear}_${currentMonth}_${d}`)==='true') wc++; }
+      if(habitChartInstance) habitChartInstance.destroy();
+      habitChartInstance = new Chart(ctxH, { type:'bar', data:{ labels:['Meditation','Workout'], datasets:[{data:[mc,wc], backgroundColor:['#ffb703','#38bdf8'], borderRadius:6}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
+
+      const ctxS = document.getElementById('studyCurveChart'); if(!ctxS) return;
+      let labels = []; let data = []; for (let d = 1; d <= dm; d++) { labels.push(`${d}`); data.push(parseInt(getItemValue(`study_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10)); }
+      if(studyChartInstance) studyChartInstance.destroy();
+      studyChartInstance = new Chart(ctxS, { type:'line', data:{ labels:labels, datasets:[{data:data, borderColor:'#06d6a0', backgroundColor:'rgba(6,214,160,0.02)', borderWidth:2, tension:0.15, fill:true, pointRadius:1}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
+    }
+
+    function prevMonth() { currentMonth--; if(currentMonth<1){currentMonth=12; currentYear--;} reloadCalendars(); }
+    function nextMonth() { currentMonth++; if(currentMonth>12){currentMonth=1; currentYear++;} reloadCalendars(); }
+    function reloadCalendars() {
+      document.getElementById('monthTitle').innerText = new Date(currentYear, currentMonth-1).toLocaleString('default',{month:'long', year:'numeric'});
+      generateCalendar('meditationCalendar','meditationProgress','meditationStats','meditation');
+      generateCalendar('workoutCalendar','workoutProgress','workoutStats','workout');
+      generateCalendar('studyCalendar','studyProgress','studyStats','study',true);
+      triggerChartUpdate();
+    }
+
+    startDigitalClock(); reloadCalendars(); loadScratchpadData(); switchView('self');
+  </script>
+</body>
+</html>
