@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission CGL 2026 & O-Level Dashboard - Master V5.1</title>
+  <title>Mission CGL 2026 & O-Level Dashboard - Master V5</title>
   <!-- Load Chart.js for ultimate data visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -163,10 +163,10 @@
       <button class="timer-btn reset" onclick="resetTimer()">Reset</button>
     </div>
 
-    <!-- FIXED SIDEBAR LABELS - ALL 4 OPTIONS NOW VISIBLE -->
     <div class="sidebar-section-title">Daily Tracking</div>
     <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
     <div class="task" id="tab-study" onclick="switchView('study')">Study Architecture</div>
+    <!-- ADDED: Daily Scratchpad View Router -->
     <div class="task" id="tab-scratchpad" onclick="switchView('scratchpad')">📝 Daily Scratchpad</div>
     <div class="task" id="tab-mocks" onclick="switchView('mocks')">📈 Mock Analytics</div>
     
@@ -274,7 +274,7 @@
         </div>
       </div>
 
-      <!-- DAILY SCRATCHPAD DESK VIEW -->
+      <!-- NEW CARD: 8 INDEPENDENT CUSTOM INPUT FIELDS AND TICK DESK GRID -->
       <div class="cards-grid" id="view-scratchpad" style="display:none;">
         <div class="card">
           <h3>📋 Daily Scratchpad (8 Target Milestones)</h3>
@@ -403,6 +403,7 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
+    // UNIVERSAL CLOUD SYNC ENGINE
     function exportDataCloud() {
       const bbtn = document.getElementById('backupBtn'); bbtn.innerText = "⏳ Saving..."; bbtn.disabled = true;
       let dump = {};
@@ -437,16 +438,17 @@
         for(let k in decoded) { localStorage.setItem(k, decoded[k]); }
         alert("🎉 Data Loaded Successfully!"); reloadCalendars(); calculateStreak(); loadScratchpadData(); refreshUI(); initStopwatch();
       })
-      .catch(() => alert("❌ Sync Failed! Check PIN."))
-      .finally(() => { fbtn.innerText = "📥 Fetch"; fbtn.disabled = false; });
+      .catch(() => alert("❌ Sync Failed! Check PIN."));
     }
 
+    // 📋 LIVE SCRATCHPAD DYNAMIC LOGIC SYSTEM
     function saveScratchText(key) {
       const textVal = document.getElementById(`input-${key}`).value;
       saveItemValue(`scratch_text_${key}`, textVal);
     }
     
     function toggleScratchRow(key) {
+      const chk = document.getElementById(`chk-text-${key}`); // internal selector adapt
       const isChecked = document.getElementById(`chk-${key}`).checked;
       saveItemValue(`scratch_status_${key}`, isChecked);
       document.getElementById(`item-${key}`).classList.toggle('done', isChecked);
@@ -769,7 +771,7 @@
     function prevMonth() { currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; } reloadCalendars(); }
     function nextMonth() { currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; } reloadCalendars(); }
 
-    startDigitalClock(); setupHeader(); initStopwatch(); reloadCalendars(); calculateStreak(); updateQuote(); refreshUI();
+    startDigitalClock(); setupHeader(); initStopwatch(); reloadCalendars(); calculateStreak(); loadScratchpadData(); refreshUI();
   </script>
 </body>
 </html>
