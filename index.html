@@ -62,7 +62,7 @@
     .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
     
     .calendar-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%; }
-    .chart-box { width: 100%; height: 200px; position: relative; }
+    .chart-box { width: 100%; height: 210px; position: relative; }
 
     /* CALENDAR GRID MATRIX */
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
@@ -225,7 +225,7 @@
       <!-- 1. SELF DISCIPLINE -->
       <div class="cards-grid" id="view-self">
         <div class="card">
-          <h3>Habits Completion Overview</h3>
+          <h3>Habits Cumulative Progression Curve</h3>
           <div class="chart-box"><canvas id="habitChart"></canvas></div>
         </div>
         <div class="calendar-grid-row">
@@ -381,7 +381,6 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
-    /* HELPER: CHECK IF DATE IS BEFORE TODAY */
     function isPastDate(y, m, d) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -568,28 +567,88 @@
       pEl.innerText = percent + '%';
     }
 
+    /* 📊 TRIGGER LIVE CHART UPDATE */
     function triggerChartUpdate() {
+      /* 1. SELF DISCIPLINE: 1-31 DATES TIMELINE CUMULATIVE HABIT GRAPH */
       const ctxH = document.getElementById('habitChart'); 
       if(ctxH) {
-        let mc=0, wc=0, dm = new Date(currentYear, currentMonth, 0).getDate();
-        for(let d=1; d<=dm; d++) { if(getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`)==='true') mc++; if(getItemValue(`workout_${currentYear}_${currentMonth}_${d}`)==='true') wc++; }
+        let dm = new Date(currentYear, currentMonth, 0).getDate();
+        let labels = [];
+        let medData = [];
+        let wrkData = [];
+        let medCum = 0;
+        let wrkCum = 0;
+
+        for (let d = 1; d <= dm; d++) {
+          labels.push(`${d}`);
+          if (getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`) === 'true') {
+            medCum++;
+          }
+          if (getItemValue(`workout_${currentYear}_${currentMonth}_${d}`) === 'true') {
+            wrkCum++;
+          }
+          medData.push(medCum);
+          wrkData.push(wrkCum);
+        }
+
         if(habitChartInstance) habitChartInstance.destroy();
         habitChartInstance = new Chart(ctxH, { 
-          type:'bar', 
-          data:{ 
-            labels:['Meditation','Workout'], 
-            datasets:[{ data:[mc,wc], backgroundColor:['#ffb703','#38bdf8'], borderRadius:6, barThickness: 18 }] 
+          type: 'line', 
+          data: { 
+            labels: labels, 
+            datasets: [
+              {
+                label: 'Meditation',
+                data: medData,
+                borderColor: '#ffb703',
+                backgroundColor: 'rgba(255, 183, 3, 0.08)',
+                borderWidth: 4.5,
+                tension: 0.25,
+                fill: true,
+                pointRadius: 3,
+                pointBackgroundColor: '#ffb703'
+              },
+              {
+                label: 'Workout',
+                data: wrkData,
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                borderWidth: 4.5,
+                tension: 0.25,
+                fill: true,
+                pointRadius: 3,
+                pointBackgroundColor: '#38bdf8'
+              }
+            ] 
           }, 
-          options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } 
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  color: '#cbd5e1',
+                  font: { size: 12, weight: 'bold' },
+                  boxWidth: 15
+                }
+              }
+            },
+            scales: {
+              x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+              y: { min: 0, max: dm, ticks: { stepSize: 5, color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.03)' } }
+            }
+          } 
         });
       }
 
+      /* 2. STUDY ARCHITECTURE CURVE */
       const ctxS = document.getElementById('studyCurveChart'); 
       if(ctxS) {
         let dm = new Date(currentYear, currentMonth, 0).getDate();
         let labels = []; let data = []; for (let d = 1; d <= dm; d++) { labels.push(`${d}`); data.push(parseInt(getItemValue(`study_${currentYear}_${currentMonth}_${d}_hours`) || '0', 10)); }
         if(studyChartInstance) studyChartInstance.destroy();
-        studyChartInstance = new Chart(ctxS, { type:'line', data:{ labels:labels, datasets:[{data:data, borderColor:'#06d6a0', backgroundColor:'rgba(6,214,160,0.08)', borderWidth:2.5, tension:0.2, fill:true, pointRadius:2}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
+        studyChartInstance = new Chart(ctxS, { type:'line', data:{ labels:labels, datasets:[{data:data, borderColor:'#06d6a0', backgroundColor:'rgba(6,214,160,0.08)', borderWidth:2.5, tension:0.2, fill:true, pointRadius:2}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ ticks:{ color:'#64748b' } }, y:{ min:0, max:12, ticks:{ stepSize:2, color:'#64748b' } } } } });
       }
     }
 
