@@ -72,6 +72,10 @@
     .day.checked { background: var(--checked-gradient); border-color: transparent; color: var(--text-bright); font-weight: 700; box-shadow: 0 4px 15px rgba(5, 149, 105, 0.3); }
     .day.today { border: 2px solid var(--secondary-bright); background: rgba(56, 189, 248, 0.05); color: var(--secondary-bright); font-weight: 800; }
     
+    /* LOCKED PAST DATES STYLING */
+    .day.locked { cursor: not-allowed; opacity: 0.45; background: #0f1622; border-style: dashed; }
+    .day.locked input[type="checkbox"] { cursor: not-allowed; opacity: 0.3; }
+
     .checkbox-container { display: inline-block; position: relative; width: 16px; height: 16px; margin-top: 4px; }
     .calendar input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #475569; border-radius: 5px; cursor: pointer; background: rgba(0,0,0,0.2); margin: 0; }
     .day.checked input[type="checkbox"] { border-color: #fff; background: #fff; }
@@ -377,6 +381,14 @@
     function getItemValue(key) { return localStorage.getItem(key) || null; }
     function saveItemValue(key, value) { localStorage.setItem(key, value.toString()); }
 
+    /* HELPER: CHECK IF DATE IS BEFORE TODAY */
+    function isPastDate(y, m, d) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkDate = new Date(y, m - 1, d);
+      return checkDate < today;
+    }
+
     function updateRandomQuote() {
       const qEl = document.getElementById('quoteText');
       if(qEl) {
@@ -501,14 +513,24 @@
         const sk = `${keyPrefix}_${currentYear}_${currentMonth}_${day}`;
         cb.checked = getItemValue(sk) === 'true';
         if (cb.checked) db.classList.add('checked');
-        if (new Date().getDate() === day && (new Date().getMonth()+1) === currentMonth) db.classList.add('today');
+        if (new Date().getDate() === day && (new Date().getMonth()+1) === currentMonth && new Date().getFullYear() === currentYear) db.classList.add('today');
         
-        cb.onchange = () => { saveItemValue(sk, cb.checked); db.classList.toggle('checked', cb.checked); updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); triggerChartUpdate(); };
+        const isLocked = isPastDate(currentYear, currentMonth, day);
+        if (isLocked) {
+          db.classList.add('locked');
+          cb.disabled = true;
+        } else {
+          cb.onchange = () => { saveItemValue(sk, cb.checked); db.classList.toggle('checked', cb.checked); updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); triggerChartUpdate(); };
+        }
         
         if (isStudy) {
           const hk = sk + '_hours'; let curH = parseInt(getItemValue(hk) || '0', 10);
           const cd = document.createElement('div'); cd.className = 'counter-container';
-          cd.innerHTML = `<button class="counter-btn" onclick="hCh('${hk}',-1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}',event)">-</button><span class="counter-value">${curH}</span><button class="counter-btn" onclick="hCh('${hk}',1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}',event)">+</button>`;
+          if (isLocked) {
+            cd.innerHTML = `<button class="counter-btn" disabled style="opacity:0.3; cursor:not-allowed;">-</button><span class="counter-value">${curH}</span><button class="counter-btn" disabled style="opacity:0.3; cursor:not-allowed;">+</button>`;
+          } else {
+            cd.innerHTML = `<button class="counter-btn" onclick="hCh('${hk}',-1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}',event)">-</button><span class="counter-value">${curH}</span><button class="counter-btn" onclick="hCh('${hk}',1,this,'${sk}','${cardId}','${progressId}','${statsId}','${keyPrefix}',event)">+</button>`;
+          }
           db.appendChild(cd);
         }
         label.appendChild(cb); db.appendChild(label); calendar.appendChild(db);
@@ -552,7 +574,14 @@
         let mc=0, wc=0, dm = new Date(currentYear, currentMonth, 0).getDate();
         for(let d=1; d<=dm; d++) { if(getItemValue(`meditation_${currentYear}_${currentMonth}_${d}`)==='true') mc++; if(getItemValue(`workout_${currentYear}_${currentMonth}_${d}`)==='true') wc++; }
         if(habitChartInstance) habitChartInstance.destroy();
-        habitChartInstance = new Chart(ctxH, { type:'bar', data:{ labels:['Meditation','Workout'], datasets:[{data:[mc,wc], backgroundColor:['#ffb703','#38bdf8'], borderRadius:6}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
+        habitChartInstance = new Chart(ctxH, { 
+          type:'bar', 
+          data:{ 
+            labels:['Meditation','Workout'], 
+            datasets:[{ data:[mc,wc], backgroundColor:['#ffb703','#38bdf8'], borderRadius:6, barThickness: 18 }] 
+          }, 
+          options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } 
+        });
       }
 
       const ctxS = document.getElementById('studyCurveChart'); 
