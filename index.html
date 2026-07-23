@@ -28,9 +28,18 @@
     
     /* SIDEBAR LAYOUT */
     .sidebar { width: 280px; background: var(--sidebar-bg); padding: 20px; box-shadow: 4px 0 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid var(--border-light); overflow-y: auto; }
-    .sidebar h2 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 15px; width: 100%; }
+    .sidebar h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; font-weight: 900; letter-spacing: 1px; text-align: center; color: var(--secondary-bright); border-bottom: 2px solid var(--bg-main); padding-bottom: 12px; width: 100%; }
     .sidebar-section-title { align-self: flex-start; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 15px 0 6px 5px; font-weight: 800; }
     
+    /* TIMER CONTAINER IN SIDEBAR */
+    .timer-container { background: #1e293b; color: white; padding: 12px; border-radius: 14px; text-align: center; margin-bottom: 15px; width: 100%; border: 1px solid var(--border-light); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .timer-mode-container { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
+    .mode-lbl { font-size: 9px; text-transform: uppercase; font-weight: 800; padding: 3px 8px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.05); color: #94a3b8; transition: all 0.2s; }
+    .mode-lbl.active { background: rgba(52, 211, 153, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .timer-display { font-size: 26px; font-weight: 900; margin-bottom: 8px; color: #ef4444; font-family: monospace; text-shadow: 0 0 8px rgba(239, 68, 68, 0.2); }
+    .timer-btn { background: linear-gradient(135deg, #059669, #0284c7); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 11px; margin: 0 2px; }
+    .timer-btn.reset { background: #475569; }
+
     .task { width: 100%; background: #151f32; padding: 10px 14px; margin: 4px 0; border-radius: 10px; text-align: left; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #94a3b8; border: 1px solid transparent; transition: all 0.2s; }
     .task:hover { background: #1e293b; color: var(--text-bright); }
     .task.active { background: rgba(52, 211, 153, 0.1); color: var(--primary-bright); border-color: rgba(52, 211, 153, 0.2); font-weight: 700; }
@@ -42,6 +51,7 @@
     .digital-clock { font-size: 12px; font-weight: 800; color: var(--secondary-bright); background: rgba(56, 189, 248, 0.08); padding: 4px 10px; border-radius: 6px; align-self: flex-start; border: 1px solid rgba(56, 189, 248, 0.15); }
     .welcome-greet { margin: 0; font-size: 20px; font-weight: 800; color: var(--text-bright); }
     .daily-quote { margin: 2px 0 0 0; font-size: 11px; color: #94a3b8; font-style: italic; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+    .streak-display { font-size: 11px; font-weight: 800; color: var(--accent-orange); background: rgba(251, 146, 60, 0.08); padding: 3px 8px; border-radius: 6px; align-self: flex-start; margin-top: 2px; border: 1px solid rgba(251, 146, 60, 0.15); }
     
     .sync-box { display: flex; flex-direction: column; gap: 6px; background: #151f32; padding: 8px; border-radius: 12px; border: 1px solid var(--border-light); }
     .sync-actions { display: flex; gap: 6px; }
@@ -62,7 +72,7 @@
     .card h3::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-bright); box-shadow: 0 0 6px var(--primary-bright); }
     
     .calendar-grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%; }
-    .chart-box { width: 100%; height: 210px; position: relative; }
+    .chart-box { width: 100%; height: 200px; position: relative; }
 
     /* CALENDAR GRID MATRIX */
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); grid-gap: 8px; width: 100%; }
@@ -170,6 +180,17 @@
   <div class="sidebar">
     <h2>DASHBOARD 2026</h2>
 
+    <!-- STOPWATCH & 3H POMODORO TIMER ENGINE -->
+    <div class="timer-container">
+      <div class="timer-mode-container">
+        <span id="mode-sw" class="mode-lbl active" onclick="switchTimerMode('sw')">Stopwatch</span>
+        <span id="mode-pomo" class="mode-lbl" onclick="switchTimerMode('pomo')">3H Pomo</span>
+      </div>
+      <div class="timer-display" id="stopwatchDisplay">00:00:00</div>
+      <button class="timer-btn" id="startStopBtn" onclick="toggleTimer()">Start</button>
+      <button class="timer-btn reset" onclick="resetTimer()">Reset</button>
+    </div>
+
     <div class="sidebar-section-title">Daily Tracking</div>
     <div class="task active" id="tab-self" onclick="switchView('self')">Self Discipline</div>
     <div class="task" id="tab-study" onclick="switchView('study')">Study Architecture</div>
@@ -202,8 +223,9 @@
     <div class="topbar">
       <div class="welcome-section">
         <div class="digital-clock" id="liveClock">00:00:00 AM</div>
-        <h1 class="welcome-greet">Hello, Utkarsh!</h1>
+        <h1 class="welcome-greet" id="greetingText">Good Day, Utkarsh!</h1>
         <p class="daily-quote" id="quoteText">"Your competition is preparing while you rest."</p>
+        <div id="streakText" class="streak-display">🔥 Study Streak: 0 Days</div>
       </div>
       
       <div class="sync-box">
@@ -350,6 +372,14 @@
     let currentActiveTab = 'self';
     let habitChartInstance = null; let studyChartInstance = null;
 
+    /* TIMER VARIABLES */
+    let isTimerRunning = false; 
+    let startTime = 0; 
+    let elapsedTimeBefore = 0; 
+    let clockInterval = null;
+    let timerMode = 'sw'; 
+    const POMO_TOTAL_SECONDS = 3 * 60 * 60; // 3 Hours Pomodoro
+
     const quotesList = [
       "\"Your competition is preparing while you rest. Secure your post.\"",
       "\"Consistency beats talent every single day. Keep grinding.\"",
@@ -388,12 +418,115 @@
       return checkDate < today;
     }
 
+    /* 👋 DYNAMIC PERSONALIZED TIME GREETING */
+    function setupGreeting() {
+      const now = new Date();
+      const hrs = now.getHours();
+      let greet = "Good Morning";
+      if (hrs >= 12 && hrs < 17) greet = "Good Afternoon";
+      else if (hrs >= 17 && hrs < 22) greet = "Good Evening";
+      else if (hrs >= 22 || hrs < 5) greet = "Hello";
+      
+      const gEl = document.getElementById('greetingText');
+      if (gEl) gEl.innerText = `${greet}, Utkarsh!`;
+    }
+
     function updateRandomQuote() {
       const qEl = document.getElementById('quoteText');
       if(qEl) {
         const randIdx = Math.floor(Math.random() * quotesList.length);
         qEl.innerText = quotesList[randIdx];
       }
+    }
+
+    function calculateStreak() {
+      let streak = 0; let today = new Date(); today.setHours(0,0,0,0);
+      while(true) {
+        let y = today.getFullYear(); let m = today.getMonth() + 1; let d = today.getDate();
+        let med = getItemValue(`meditation_${y}_${m}_${d}`) === 'true';
+        let wrk = getItemValue(`workout_${y}_${m}_${d}`) === 'true';
+        let hours = parseInt(getItemValue(`study_${y}_${m}_${d}_hours`) || '0', 10);
+        if(med || wrk || hours > 0) { streak++; today.setDate(today.getDate() - 1); } else { break; }
+      }
+      const sEl = document.getElementById('streakText');
+      if(sEl) sEl.innerText = `🔥 Study Streak: ${streak} Days`;
+    }
+
+    /* ⏱️ STOPWATCH & POMODORO LOGIC */
+    function initStopwatch() {
+      timerMode = localStorage.getItem('tm_mode') || 'sw';
+      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
+      const activeLbl = document.getElementById(`mode-${timerMode}`);
+      if(activeLbl) activeLbl.classList.add('active');
+      
+      isTimerRunning = localStorage.getItem('sw_running') === 'true';
+      elapsedTimeBefore = parseInt(localStorage.getItem('sw_elapsed') || '0', 10);
+      startTime = parseInt(localStorage.getItem('sw_start_time') || '0', 10);
+      
+      const btn = document.getElementById("startStopBtn");
+      if (isTimerRunning && startTime > 0) {
+        if(btn) { btn.innerText = "Pause"; btn.style.background = "#475569"; }
+        startClockInterval();
+      } else {
+        updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore));
+      }
+    }
+
+    function switchTimerMode(mode) {
+      if(isTimerRunning) { alert("Please Pause the timer first!"); return; }
+      timerMode = mode; localStorage.setItem('tm_mode', mode);
+      document.querySelectorAll('.mode-lbl').forEach(l => l.classList.remove('active'));
+      const modeEl = document.getElementById(`mode-${mode}`);
+      if(modeEl) modeEl.classList.add('active');
+      elapsedTimeBefore = 0; startTime = 0; localStorage.setItem('sw_elapsed', '0');
+      updateTimerDisplay(mode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById("startStopBtn");
+      if (isTimerRunning) {
+        let currentElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
+        isTimerRunning = false; elapsedTimeBefore = currentElapsed;
+        localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
+        clearInterval(clockInterval); 
+        if(btn) { btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #059669, #0284c7)"; }
+        updateTimerDisplay(timerMode === 'sw' ? elapsedTimeBefore : (POMO_TOTAL_SECONDS - elapsedTimeBefore));
+      } else {
+        isTimerRunning = true; startTime = Date.now();
+        localStorage.setItem('sw_running', 'true'); localStorage.setItem('sw_start_time', startTime.toString()); localStorage.setItem('sw_elapsed', elapsedTimeBefore.toString());
+        if(btn) { btn.innerText = "Pause"; btn.style.background = "#475569"; }
+        startClockInterval();
+      }
+    }
+
+    function resetTimer() {
+      isTimerRunning = false; clearInterval(clockInterval); elapsedTimeBefore = 0; startTime = 0;
+      localStorage.setItem('sw_running', 'false'); localStorage.setItem('sw_elapsed', '0'); localStorage.setItem('sw_start_time', '0');
+      const btn = document.getElementById("startStopBtn");
+      if(btn) { btn.innerText = "Start"; btn.style.background = "linear-gradient(135deg, #059669, #0284c7)"; }
+      updateTimerDisplay(timerMode === 'sw' ? 0 : POMO_TOTAL_SECONDS);
+    }
+
+    function startClockInterval() {
+      clearInterval(clockInterval);
+      clockInterval = setInterval(() => {
+        let liveElapsed = Math.floor((Date.now() - startTime) / 1000) + elapsedTimeBefore;
+        if (timerMode === 'pomo') {
+          let remaining = POMO_TOTAL_SECONDS - liveElapsed;
+          if (remaining <= 0) { clearInterval(clockInterval); resetTimer(); alert("🏆 3-Hour Pomodoro Completed, Utkarsh!"); return; }
+          updateTimerDisplay(remaining);
+        } else {
+          updateTimerDisplay(liveElapsed);
+        }
+      }, 500);
+    }
+
+    function updateTimerDisplay(totalSecs) {
+      const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0');
+      const secs = String(totalSecs % 60).padStart(2, '0');
+      const displayEl = document.getElementById("stopwatchDisplay");
+      if(displayEl) displayEl.innerText = `${hrs}:${mins}:${secs}`;
     }
 
     function exportDataString() {
@@ -408,7 +541,7 @@
       let val = document.getElementById('syncTokenField').value.trim(); if(!val) return;
       try {
         let decoded = JSON.parse(decodeURIComponent(atob(val))); for(let k in decoded) { localStorage.setItem(k, decoded[k]); }
-        alert("🎉 Data Restored Successfully!"); reloadCalendars(); loadScratchpadData(); loadNotesData(); loadVocabData(); switchView('self');
+        alert("🎉 Data Restored Successfully!"); reloadCalendars(); loadScratchpadData(); loadNotesData(); loadVocabData(); initStopwatch(); switchView('self');
       } catch(e) { alert("Invalid Code String!"); }
     }
 
@@ -476,6 +609,7 @@
     function switchView(viewKey) {
       currentActiveTab = viewKey;
       updateRandomQuote();
+      setupGreeting();
       
       document.querySelectorAll('.task').forEach(t => t.classList.remove('active'));
       if(document.getElementById(`tab-${viewKey}`)) document.getElementById(`tab-${viewKey}`).classList.add('active');
@@ -519,7 +653,7 @@
           db.classList.add('locked');
           cb.disabled = true;
         } else {
-          cb.onchange = () => { saveItemValue(sk, cb.checked); db.classList.toggle('checked', cb.checked); updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); triggerChartUpdate(); };
+          cb.onchange = () => { saveItemValue(sk, cb.checked); db.classList.toggle('checked', cb.checked); updateProgress(cardId, progressId, statsId, keyPrefix, isStudy); calculateStreak(); triggerChartUpdate(); };
         }
         
         if (isStudy) {
@@ -546,6 +680,7 @@
         if(v > 0 && !cb.checked) { cb.checked = true; cb.onchange(); }
         else if(v === 0 && cb.checked) { cb.checked = false; cb.onchange(); }
         updateProgress(cid, pid, stid, kp, true);
+        calculateStreak();
         triggerChartUpdate();
       }
     }
@@ -684,10 +819,11 @@
       generateCalendar('meditationCalendar','meditationProgress','meditationStats','meditation');
       generateCalendar('workoutCalendar','workoutProgress','workoutStats','workout');
       generateCalendar('studyCalendar','studyProgress','studyStats','study',true);
+      calculateStreak();
       if(['self', 'study'].includes(currentActiveTab)) triggerChartUpdate();
     }
 
-    startDigitalClock(); reloadCalendars(); loadScratchpadData(); loadNotesData(); loadVocabData(); switchView('self');
+    startDigitalClock(); setupGreeting(); initStopwatch(); reloadCalendars(); loadScratchpadData(); loadNotesData(); loadVocabData(); switchView('self');
   </script>
 </body>
 </html>
