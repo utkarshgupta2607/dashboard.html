@@ -787,6 +787,7 @@
       }
     }
 
+    /* 📚 UPDATED DROPDOWN SHEET: Includes In Progress, Completed, Revision Completed */
     function renderSyllabusSheet(sk) {
       const titles = { 
         math: "Advanced Maths", english: "English Grammar", reasoning: "Reasoning Matrix", science: "Science Module",
@@ -800,11 +801,29 @@
       
       if(syllabusData[sk]) {
         syllabusData[sk].forEach((c, i) => {
-          let sKey = `surya_2026_${sk}_ch_${i+1}`; let curS = getItemValue(sKey) || 'not_started';
-          tb.innerHTML += `<tr><td>#${i+1}</td><td>${c}</td><td><select class="status-select" data-status="${curS}" onchange="saveItemValue('${sKey}', this.value); renderSyllabusSheet('${sk}');"><option value="not_started" ${curS==='not_started'?'selected':''}>❌ Not Started</option><option value="completed" ${curS==='completed'?'selected':''}>✅ Completed</option></select></td></tr>`;
+          let sKey = `surya_2026_${sk}_ch_${i+1}`; 
+          let curS = getItemValue(sKey) || 'not_started';
+          tb.innerHTML += `
+            <tr>
+              <td>#${i+1}</td>
+              <td>${c}</td>
+              <td>
+                <select class="status-select" data-status="${curS}" onchange="saveItemValue('${sKey}', this.value); renderSyllabusSheet('${sk}');">
+                  <option value="not_started" ${curS==='not_started'?'selected':''}>❌ Not Started</option>
+                  <option value="in_progress" ${curS==='in_progress'?'selected':''}>⏳ In Progress</option>
+                  <option value="completed" ${curS==='completed'?'selected':''}>✅ Completed</option>
+                  <option value="revision_completed" ${curS==='revision_completed'?'selected':''}>📝 Revision Completed</option>
+                </select>
+              </td>
+            </tr>`;
         });
         
-        let done = syllabusData[sk].filter((_, i) => getItemValue(`surya_2026_${sk}_ch_${i+1}`) === 'completed').length;
+        // Count both 'completed' and 'revision_completed' towards progress circle calculation
+        let done = syllabusData[sk].filter((_, i) => {
+          let val = getItemValue(`surya_2026_${sk}_ch_${i+1}`);
+          return val === 'completed' || val === 'revision_completed';
+        }).length;
+
         let p = Math.round((done / syllabusData[sk].length) * 100);
         const sc = document.getElementById('syllabusCircle'); sc.innerText = p + '%';
         sc.style.background = `radial-gradient(closest-side, #1e293b 73%, transparent 76%), conic-gradient(#06d6a0 ${p}%, #151f32 0%)`;
