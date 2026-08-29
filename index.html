@@ -148,7 +148,7 @@
     .vocab-sentence { font-size: 12px; color: var(--text-muted); font-style: italic; margin-top: 2px; }
 
     /* SYLLABUS LAYOUT */
-    .syllabus-layout { display: grid; grid-template-columns: 280px 1fr; gap: 25px; }
+    .syllabus-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
     .syllabus-side-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); text-align: center; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px; }
     .circle-progress { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin: 12px 0; color: var(--text-bright); position: relative; }
     .syllabus-table-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-light); overflow-x: auto; width: 100%; }
@@ -156,22 +156,22 @@
     .syllabus-table th, .syllabus-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 600; }
     .status-select { padding: 6px 10px; border-radius: 8px; border: 1px solid #475569; font-weight: 700; cursor: pointer; width: 100%; background: var(--bg-main); color: white; }
 
-    /* 📖 MATH FORMULA BOOK STYLING */
-    .math-book-container { width: 100%; margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; text-align: left; }
-    .math-book-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .math-book-title { font-size: 13px; font-weight: 900; color: var(--secondary-bright); display: flex; align-items: center; gap: 5px; }
-    .book-nav-btn { background: #151f32; border: 1px solid var(--border-light); color: var(--text-bright); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; }
-    .book-nav-btn:hover { border-color: var(--secondary-bright); }
-    .math-book-page { background: #121a2a; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.3); }
-    .book-page-tab-strip { display: flex; gap: 4px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 4px; }
-    .book-tab-btn { background: #151f32; border: 1px solid var(--border-light); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+    /* 📖 MATH FORMULA BOOK CARD STYLING */
+    .math-book-card { background: #131d2e; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .math-book-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px; }
+    .math-book-title { font-size: 15px; font-weight: 900; color: var(--secondary-bright); display: flex; align-items: center; gap: 8px; }
+    .book-nav-btn { background: #1e293b; border: 1px solid var(--border-light); color: var(--text-bright); padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
+    .book-nav-btn:hover { border-color: var(--secondary-bright); background: #24344d; }
+    .book-page-tab-strip { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
+    .book-tab-btn { background: #1e293b; border: 1px solid var(--border-light); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
     .book-tab-btn.active { background: rgba(56, 189, 248, 0.15); color: var(--secondary-bright); border-color: var(--secondary-bright); }
-    .book-content-scroll { max-height: 280px; overflow-y: auto; font-size: 11px; }
-    .book-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-    .book-cell { background: #182338; padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; }
-    .book-cell span:first-child { color: var(--text-muted); font-weight: 600; }
-    .book-cell span:last-child { color: var(--primary-bright); font-weight: 800; }
-    .book-table-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted rgba(255,255,255,0.05); }
+    .book-content-scroll { max-height: 320px; overflow-y: auto; font-size: 12px; padding-right: 5px; }
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+    .book-cell { background: #1a263c; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
+    .book-cell span:first-child { color: var(--text-muted); font-weight: 700; }
+    .book-cell span:last-child { color: var(--primary-bright); font-weight: 900; }
+    .book-table-row { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px dotted rgba(255,255,255,0.06); }
+    .book-table-row:nth-child(even) { background: rgba(255,255,255,0.02); border-radius: 4px; }
 
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
@@ -372,29 +372,28 @@
           <h3 id="syllabusSubjectTitle" style="margin:0;">Subject</h3>
           <div class="circle-progress" id="syllabusCircle">0%</div>
           <div id="syllabusCountText" style="font-size:11px; font-weight:700; color:var(--text-muted);">0 of 0 Completed</div>
-
-          <!-- 📖 MULTI-PAGE MATH FORMULA BOOKLET (SHOWN UNDER MATH PROGRESS CIRCLE) -->
-          <div id="mathFormulaBook" class="math-book-container" style="display:none;">
-            <div class="math-book-header">
-              <div class="math-book-title">📖 Math Vault Book</div>
-              <div style="display:flex; gap:4px;">
-                <button class="book-nav-btn" onclick="navMathBook(-1)">◀ Prev</button>
-                <button class="book-nav-btn" onclick="navMathBook(1)">Next ▶</button>
-              </div>
-            </div>
-            <div class="math-book-page">
-              <div class="book-page-tab-strip">
-                <button class="book-tab-btn active" id="btab-0" onclick="setMathBookPage(0)">1-100 Tables</button>
-                <button class="book-tab-btn" id="btab-1" onclick="setMathBookPage(1)">1-100 Squares</button>
-                <button class="book-tab-btn" id="btab-2" onclick="setMathBookPage(2)">1-100 Cubes</button>
-                <button class="book-tab-btn" id="btab-3" onclick="setMathBookPage(3)">Powers & Factorials</button>
-                <button class="book-tab-btn" id="btab-4" onclick="setMathBookPage(4)">Fractions & %</button>
-              </div>
-              <div id="mathBookContent" class="book-content-scroll"></div>
-            </div>
-          </div>
         </div>
+
         <div class="syllabus-table-card">
+          <!-- 📖 MULTI-PAGE MATH FORMULA BOOKLET (SHOWN EXCLUSIVELY ON ADVANCED MATHS VIEW) -->
+          <div id="mathFormulaBook" class="math-book-card" style="display:none;">
+            <div class="math-book-header">
+              <div class="math-book-title">📖 Advanced Math Formula & Calculation Vault</div>
+              <div style="display:flex; gap:6px;">
+                <button class="book-nav-btn" onclick="navMathBook(-1)">◀ Prev Page</button>
+                <button class="book-nav-btn" onclick="navMathBook(1)">Next Page ▶</button>
+              </div>
+            </div>
+            <div class="book-page-tab-strip">
+              <button class="book-tab-btn active" id="btab-0" onclick="setMathBookPage(0)">1-100 Tables</button>
+              <button class="book-tab-btn" id="btab-1" onclick="setMathBookPage(1)">1-100 Squares</button>
+              <button class="book-tab-btn" id="btab-2" onclick="setMathBookPage(2)">1-100 Cubes</button>
+              <button class="book-tab-btn" id="btab-3" onclick="setMathBookPage(3)">Powers & Factorials</button>
+              <button class="book-tab-btn" id="btab-4" onclick="setMathBookPage(4)">Fractions & % Chart</button>
+            </div>
+            <div id="mathBookContent" class="book-content-scroll"></div>
+          </div>
+
           <table class="syllabus-table">
             <thead><tr><th style="width:15%">#</th><th style="width:55%">Chapter</th><th style="width:30%">Status</th></tr></thead>
             <tbody id="syllabusTableBody"></tbody>
@@ -587,7 +586,8 @@
     /* 📋 SCRATCHPAD HANDLERS */
     function saveScratchText(key) { saveItemValue(`scr_txt_${key}`, document.getElementById(`input-${key}`).value); }
     function toggleScratchRow(key) {
-      let isChecked = document.getElementById(`chk-${key}`).checked; saveItemValue(`scr_sts_${key}`, isChecked);
+      let isChecked = document.getElementById(`chk-${key}`).checked; 
+      saveItemValue(`scr_sts_${key}`, isChecked);
       document.getElementById(`item-${key}`).classList.toggle('done', isChecked);
     }
     function loadScratchpadData() {
@@ -595,7 +595,11 @@
         let k = `task${i}`;
         if(document.getElementById(`input-${k}`)) document.getElementById(`input-${k}`).value = getItemValue(`scr_txt_${k}`) || '';
         let chk = document.getElementById(`chk-${k}`);
-        if(chk) { let s = getItemValue(`scr_sts_${k}`) === 'true'; chk.checked = s; document.getElementById(`item-${key}`).classList.toggle('done', s); }
+        if(chk) { 
+          let s = getItemValue(`scr_sts_${k}`) === 'true'; 
+          chk.checked = s; 
+          document.getElementById(`item-${k}`).classList.toggle('done', s); 
+        }
       }
     }
 
@@ -661,7 +665,7 @@
 
       if(p === 0) {
         // Page 1: 1-100 Tables
-        let html = '<div style="margin-bottom:8px; display:flex; gap:6px; align-items:center;"><span style="color:#cbd5e1; font-weight:bold; font-size:10px;">Select Table:</span><select id="tblSelect" style="background:#182338; color:white; border:1px solid #475569; border-radius:6px; font-size:10px; padding:2px 6px;" onchange="renderSpecificTable(this.value)">';
+        let html = '<div style="margin-bottom:12px; display:flex; gap:10px; align-items:center;"><span style="color:#cbd5e1; font-weight:bold; font-size:12px;">Select Multiplication Table:</span><select id="tblSelect" style="background:#182338; color:white; border:1px solid #475569; border-radius:6px; font-size:12px; padding:4px 10px; outline:none;" onchange="renderSpecificTable(this.value)">';
         for(let t=1; t<=100; t++) html += `<option value="${t}">Table of ${t}</option>`;
         html += '</select></div><div id="tableOutput"></div>';
         container.innerHTML = html;
@@ -684,8 +688,7 @@
         container.innerHTML = html;
       } else if(p === 3) {
         // Page 4: Powers & Factorials
-        let html = '<div style="color:var(--secondary-bright); font-weight:800; margin-bottom:4px;">⚡ Important Powers</div><div class="book-grid" style="margin-bottom:12px;">';
-        // Powers of 2, 3, 5, 6, 7
+        let html = '<div style="color:var(--secondary-bright); font-weight:800; margin-bottom:8px;">⚡ Important Exponential Powers</div><div class="book-grid" style="margin-bottom:15px;">';
         for(let i=1; i<=10; i++) html += `<div class="book-cell"><span>2^${i}</span><span>${Math.pow(2,i)}</span></div>`;
         for(let i=1; i<=6; i++) html += `<div class="book-cell"><span>3^${i}</span><span>${Math.pow(3,i)}</span></div>`;
         for(let i=1; i<=5; i++) html += `<div class="book-cell"><span>5^${i}</span><span>${Math.pow(5,i)}</span></div>`;
@@ -693,7 +696,7 @@
         for(let i=1; i<=4; i++) html += `<div class="book-cell"><span>7^${i}</span><span>${Math.pow(7,i)}</span></div>`;
         html += '</div>';
 
-        html += '<div style="color:var(--secondary-bright); font-weight:800; margin-bottom:4px;">🔥 1 to 100 Factorials</div><div class="book-grid">';
+        html += '<div style="color:var(--secondary-bright); font-weight:800; margin-bottom:8px;">🔥 1 to 100 Exact Factorials (n!)</div><div class="book-grid">';
         let fact = 1n;
         for(let i=1; i<=100; i++) {
           fact *= BigInt(i);
@@ -717,7 +720,7 @@
           {f:"5/8", p:"62.5%", d:"0.625"}, {f:"7/8", p:"87.5%", d:"0.875"}, {f:"2/3", p:"66.66%", d:"0.666"},
           {f:"4/7", p:"57.14%", d:"0.571"}, {f:"5/6", p:"83.33%", d:"0.833"}, {f:"3/4", p:"75%", d:"0.75"}
         ];
-        let html = '<div style="margin-bottom:6px; color:#94a3b8; font-size:10px;">Fraction ➔ Percentage ➔ Decimal</div>';
+        let html = '<div style="margin-bottom:8px; color:#94a3b8; font-size:11px; font-weight:700;">Fraction ➔ Percentage ➔ Decimal Value</div>';
         fractions.forEach(item => {
           html += `<div class="book-table-row"><span><strong>${item.f}</strong></span><span style="color:var(--primary-bright); font-weight:700;">${item.p}</span><span style="color:var(--secondary-bright); font-weight:600;">${item.d}</span></div>`;
         });
@@ -729,7 +732,7 @@
       const out = document.getElementById('tableOutput');
       if(!out) return;
       num = parseInt(num, 10);
-      let html = '<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:4px;">';
+      let html = '<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:6px;">';
       for(let i=1; i<=10; i++) {
         html += `<div class="book-cell"><span>${num} × ${i}</span><span>${num*i}</span></div>`;
       }
@@ -962,6 +965,7 @@
             </tr>`;
         });
         
+        // Count both 'completed' and 'revision_completed' towards progress circle calculation
         let done = syllabusData[sk].filter((_, i) => {
           let val = getItemValue(`surya_2026_${sk}_ch_${i+1}`);
           return val === 'completed' || val === 'revision_completed';
